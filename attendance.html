@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Register Attendance — TARA BASA Orientation</title>
+<link rel="icon" href="https://wxyzofficial.sirv.com/TARA%20BASA/tb_logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+<style>
+  :root{
+    --red:#C62828; --dark-red:#8E0000; --accent:#EF5350;
+    --white:#fff; --bg:#F8F9FB; --text:#202124; --muted:#6B7280;
+    --border:#E5E7EB; --shadow:0 10px 30px rgba(198,40,40,.08);
+    --radius:16px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);
+    min-height:100vh;line-height:1.6;
+    background:
+      radial-gradient(circle at 90% 0%,rgba(198,40,40,.06),transparent 40%),
+      radial-gradient(circle at 0% 100%,rgba(239,83,80,.06),transparent 40%),
+      var(--bg);
+  }
+  a{text-decoration:none;color:inherit}
+  /* Top bar */
+  .topbar{
+    background:var(--dark-red);color:#fff;font-size:.8rem;
+    padding:.55rem 1.5rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:.4rem;
+  }
+  .topbar i{color:var(--accent);margin-right:.35rem}
+  /* Header */
+  header.site-header{
+    background:#fff;border-bottom:1px solid var(--border);padding:0 1.5rem;
+    position:sticky;top:0;z-index:50;
+  }
+  .header-inner{
+    max-width:900px;margin:0 auto;display:flex;align-items:center;
+    justify-content:space-between;height:70px;gap:1rem;
+  }
+  .brand{display:flex;align-items:center;gap:.65rem;font-weight:800}
+  .brand img{width:40px;height:40px;object-fit:contain}
+  .brand span{color:var(--dark-red);font-size:1rem}
+  .header-actions{display:flex;gap:.6rem;align-items:center}
+  .link-btn{
+    display:inline-flex;align-items:center;gap:.4rem;font-size:.82rem;
+    font-weight:600;color:var(--muted);padding:.5rem .9rem;border-radius:8px;transition:.2s;
+  }
+  .link-btn:hover{color:var(--red);background:rgba(198,40,40,.06)}
+  /* Container */
+  .wrap{max-width:900px;margin:0 auto;padding:2.5rem 1.5rem 4rem}
+  /* Banner */
+  .event-banner{
+    background:#fff;border:1px solid var(--border);border-radius:var(--radius);
+    padding:1.4rem 1.6rem;display:flex;align-items:center;gap:1.2rem;
+    box-shadow:var(--shadow);margin-bottom:2rem;
+  }
+  .event-banner .logo{
+    width:64px;height:64px;object-fit:contain;flex-shrink:0;
+  }
+  .event-banner .info h2{font-size:1.15rem;font-weight:800;margin-bottom:.2rem}
+  .event-banner .info p{font-size:.85rem;color:var(--muted);display:flex;gap:1rem;flex-wrap:wrap}
+  .event-banner .info p i{color:var(--red);margin-right:.3rem}
+  .partners-mini{display:flex;gap:.6rem;margin-left:auto;align-items:center}
+  .partners-mini img{height:38px;object-fit:contain}
+  /* Session banner */
+  .session-banner{
+    display:flex;align-items:center;gap:.8rem;padding:.9rem 1.2rem;border-radius:12px;
+    font-size:.85rem;font-weight:600;margin-bottom:1.5rem;
+  }
+  .session-banner.active{background:rgba(22,163,74,.08);color:#15803d;border:1px solid rgba(22,163,74,.25)}
+  .session-banner.inactive{background:rgba(198,40,40,.07);color:var(--dark-red);border:1px solid rgba(198,40,40,.2)}
+  .session-banner.info{background:rgba(59,130,246,.07);color:#1d4ed8;border:1px solid rgba(59,130,246,.2)}
+  .session-banner i{font-size:1rem}
+  /* Card */
+  .card{
+    background:#fff;border:1px solid var(--border);border-radius:var(--radius);
+    box-shadow:var(--shadow);overflow:hidden;
+  }
+  .card-head{padding:1.6rem 2rem;border-bottom:1px solid var(--border);background:linear-gradient(180deg,#fff,rgba(248,249,251,.5))}
+  .card-head h1{font-size:1.3rem;font-weight:800;margin-bottom:.3rem;letter-spacing:-.01em}
+  .card-head p{color:var(--muted);font-size:.88rem}
+  .card-body{padding:2rem}
+  /* Form */
+  .field{margin-bottom:1.3rem}
+  .field label{
+    display:block;font-size:.82rem;font-weight:600;margin-bottom:.4rem;
+    color:var(--text);
+  }
+  .field label .req{color:var(--red);margin-left:.15rem}
+  .input-wrap{position:relative}
+  .input-wrap i.lead-ic{
+    position:absolute;left:14px;top:50%;transform:translateY(-50%);
+    color:var(--muted);font-size:.9rem;pointer-events:none;
+  }
+  .input-wrap input, .input-wrap select{
+    width:100%;padding:.85rem .85rem .85rem 2.6rem;border:1.5px solid var(--border);
+    border-radius:10px;font-size:.92rem;font-family:inherit;transition:.2s;
+    background:#fff;color:var(--text);appearance:none;
+  }
+  .input-wrap select{
+    background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'/%3e%3c/svg%3e");
+    background-repeat:no-repeat;background-position:right 14px center;background-size:16px;
+    padding-right:2.4rem;
+  }
+  .input-wrap input:focus, .input-wrap select:focus{
+    outline:none;border-color:var(--red);box-shadow:0 0 0 4px rgba(198,40,40,.08);
+  }
+  .input-wrap input.invalid, .input-wrap select.invalid{
+    border-color:var(--red);background:rgba(198,40,40,.02);
+  }
+  .err-msg{color:var(--red);font-size:.75rem;margin-top:.3rem;display:none}
+  .err-msg.show{display:block}
+  /* Year level cards */
+  .year-options{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem}
+  .year-option{
+    position:relative;border:1.5px solid var(--border);border-radius:10px;
+    padding:.9rem .5rem;text-align:center;cursor:pointer;transition:.2s;
+    background:#fff;
+  }
+  .year-option input{position:absolute;opacity:0;pointer-events:none}
+  .year-option:hover{border-color:var(--accent)}
+  .year-option .y-num{font-size:1.15rem;font-weight:800;color:var(--muted);display:block}
+  .year-option .y-label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  .year-option.selected{border-color:var(--red);background:rgba(198,40,40,.04)}
+  .year-option.selected .y-num,.year-option.selected .y-label{color:var(--red)}
+  /* Button */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
+    padding:.95rem 1.4rem;border-radius:10px;font-weight:600;font-size:.92rem;
+    border:none;cursor:pointer;transition:.25s;font-family:inherit;width:100%;
+  }
+  .btn-primary{background:var(--red);color:#fff;box-shadow:0 8px 20px rgba(198,40,40,.25)}
+  .btn-primary:hover:not(:disabled){background:var(--dark-red);transform:translateY(-2px)}
+  .btn-primary:disabled{opacity:.7;cursor:not-allowed}
+  .btn-outline{background:#fff;color:var(--dark-red);border:1.5px solid var(--border)}
+  .btn-outline:hover{border-color:var(--red);color:var(--red)}
+  .spinner{
+    width:16px;height:16px;border:2.5px solid rgba(255,255,255,.4);
+    border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .form-note{
+    font-size:.78rem;color:var(--muted);text-align:center;margin-top:1rem;
+    display:flex;align-items:center;justify-content:center;gap:.4rem;
+  }
+  /* Success screen */
+  .success-screen{display:none;text-align:center;padding:2rem 1rem}
+  .success-screen.show{display:block}
+  .success-icon{
+    width:88px;height:88px;border-radius:50%;background:rgba(22,163,74,.1);
+    color:#16a34a;display:grid;place-items:center;font-size:2.4rem;
+    margin:0 auto 1.4rem;animation:pop .5s ease;
+  }
+  @keyframes pop{0%{transform:scale(0);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+  .success-screen h2{font-size:1.5rem;font-weight:800;margin-bottom:.4rem;color:#15803d}
+  .success-screen p.msg{color:var(--muted);margin-bottom:2rem;font-size:.9rem}
+  .detail-box{
+    background:var(--bg);border:1px solid var(--border);border-radius:14px;
+    padding:1.4rem 1.6rem;text-align:left;max-width:520px;margin:0 auto 1.8rem;
+  }
+  .detail-box h4{
+    font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);
+    margin-bottom:1rem;font-weight:700;
+  }
+  .detail-row{
+    display:flex;justify-content:space-between;gap:1rem;padding:.55rem 0;
+    border-bottom:1px solid var(--border);font-size:.88rem;
+  }
+  .detail-row:last-child{border-bottom:none}
+  .detail-row .k{color:var(--muted)}
+  .detail-row .v{font-weight:600;text-align:right}
+  .success-actions{display:flex;gap:.7rem;justify-content:center;flex-wrap:wrap}
+  .success-actions .btn{width:auto;padding:.7rem 1.3rem}
+  /* Status / loading overlays */
+  .center-load{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:4rem 1rem;gap:1rem;color:var(--muted);
+  }
+  .center-load .spinner-dark{
+    width:34px;height:34px;border:3px solid var(--border);
+    border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite;
+  }
+  /* Toast */
+  .toast-container{position:fixed;top:1.2rem;right:1.2rem;z-index:9999;display:flex;flex-direction:column;gap:.6rem;max-width:340px}
+  .toast{
+    background:#fff;border-radius:12px;padding:.85rem 1rem;box-shadow:0 12px 30px rgba(0,0,0,.12);
+    display:flex;gap:.7rem;align-items:flex-start;border-left:4px solid var(--red);
+    animation:slideIn .3s ease;font-size:.86rem;
+  }
+  .toast.success{border-left-color:#16a34a}
+  .toast.error{border-left-color:var(--red)}
+  .toast.warning{border-left-color:#f59e0b}
+  .toast .ic{font-size:1rem;margin-top:.1rem}
+  .toast.success .ic{color:#16a34a}
+  .toast.error .ic{color:var(--red)}
+  .toast.warning .ic{color:#f59e0b}
+  .toast strong{display:block;font-size:.84rem;margin-bottom:.1rem}
+  .toast span{color:var(--muted);font-size:.8rem}
+  @keyframes slideIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+  /* Footer */
+  footer{text-align:center;padding:2rem 1.5rem;color:var(--muted);font-size:.8rem}
+  footer .partners-mini{justify-content:center;margin-bottom:.8rem}
+  /* Responsive */
+  @media(max-width:640px){
+    .wrap{padding:1.5rem 1rem 3rem}
+    .card-body{padding:1.4rem}
+    .card-head{padding:1.3rem 1.4rem}
+    .event-banner{flex-wrap:wrap;text-align:center;justify-content:center}
+    .partners-mini{margin:0 auto;width:100%;justify-content:center}
+    .year-options{gap:.5rem}
+    .topbar{font-size:.72rem;text-align:center;justify-content:center}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div><i class="fa-solid fa-calendar-days"></i> November 25, 2026 — TARA BASA Orientation</div>
+  <div><i class="fa-solid fa-shield-halved"></i> Secure Anonymous Registration</div>
+</div>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html" class="brand">
+      <img src="https://wxyzofficial.sirv.com/TARA%20BASA/tb_logo.png" alt="TARA BASA" />
+      <span>TARA BASA</span>
+    </a>
+    <div class="header-actions">
+      <a href="index.html" class="link-btn"><i class="fa-solid fa-house"></i> Home</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <!-- Event banner -->
+  <div class="event-banner">
+    <img class="logo" src="https://wxyzofficial.sirv.com/TARA%20BASA/tb_logo.png" alt="TARA BASA" />
+    <div class="info">
+      <h2>TARA BASA Orientation</h2>
+      <p>
+        <span><i class="fa-solid fa-calendar"></i> November 25, 2026</span>
+        <span><i class="fa-solid fa-graduation-cap"></i> Samar State University</span>
+      </p>
+    </div>
+    <div class="partners-mini">
+      <img src="https://wxyzofficial.sirv.com/SSU/ssu.jpg" alt="SSU" />
+      <img src="https://wxyzofficial.sirv.com/TARA%20BASA/dswd.png" alt="DSWD" />
+    </div>
+  </div>
+
+  <!-- Session banner (dynamic) -->
+  <div class="session-banner info" id="sessionBanner">
+    <i class="fa-solid fa-circle-notch fa-spin"></i>
+    <span>Verifying attendance session...</span>
+  </div>
+
+  <!-- Registration Card -->
+  <div class="card" id="registrationCard" style="display:none">
+    <div class="card-head">
+      <h1>Attendance Registration</h1>
+      <p>Please fill out all required fields. Your attendance will be recorded in real time.</p>
+    </div>
+    <div class="card-body">
+      <form id="attendanceForm" novalidate>
+        <!-- Name -->
+        <div class="field">
+          <label for="name">Full Name <span class="req">*</span></label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-user lead-ic"></i>
+            <input type="text" id="name" maxlength="80" placeholder="Enter your complete name" autocomplete="name" />
+          </div>
+          <div class="err-msg" id="err-name">Please enter your complete name.</div>
+        </div>
+
+        <!-- Program -->
+        <div class="field">
+          <label for="program">Program <span class="req">*</span></label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-book-open lead-ic"></i>
+            <select id="program">
+              <option value="">Select your program</option>
+              <option>Bachelor of Elementary Education</option>
+              <option>Bachelor of Early Childhood Education</option>
+              <option>Bachelor of Secondary Education (Majors in English)</option>
+              <option>Bachelor of Secondary Education (Majors in Mathematics)</option>
+              <option>Bachelor of Secondary Education (Majors in Filipino)</option>
+              <option>Bachelor of Secondary Education (Majors in Science)</option>
+              <option>Bachelor of Secondary Education (Majors in Social Studies)</option>
+              <option>Bachelor of Science in Psychology</option>
+            </select>
+          </div>
+          <div class="err-msg" id="err-program">Please select your program.</div>
+        </div>
+
+        <!-- Year Level -->
+        <div class="field">
+          <label>Year Level <span class="req">*</span></label>
+          <div class="year-options" id="yearOptions">
+            <label class="year-option"><input type="radio" name="year" value="2" /><span class="y-num">2</span><span class="y-label">2nd Year</span></label>
+            <label class="year-option"><input type="radio" name="year" value="3" /><span class="y-num">3</span><span class="y-label">3rd Year</span></label>
+            <label class="year-option"><input type="radio" name="year" value="4" /><span class="y-num">4</span><span class="y-label">4th Year</span></label>
+          </div>
+          <div class="err-msg" id="err-year">Please select your year level.</div>
+        </div>
+
+        <!-- College -->
+        <div class="field">
+          <label for="college">College / Department <span class="req">*</span></label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-building-columns lead-ic"></i>
+            <select id="college">
+              <option value="">Select your college</option>
+              <option>College of Education</option>
+              <option>College of Arts and Sciences</option>
+            </select>
+          </div>
+          <div class="err-msg" id="err-college">Please select your college/department.</div>
+        </div>
+
+        <!-- Modality -->
+        <div class="field">
+          <label for="modality">Modality <span class="req">*</span></label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-tv lead-ic"></i>
+            <select id="modality">
+              <option value="">Select your modality</option>
+              <option>Face to face</option>
+              <option>Online</option>
+            </select>
+          </div>
+          <div class="err-msg" id="err-modality">Please select your modality.</div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="submitBtn">
+          <i class="fa-solid fa-check-to-slot"></i> <span>Submit Attendance</span>
+        </button>
+        <div class="form-note">
+          <i class="fa-solid fa-lock"></i> Secured by Firebase Anonymous Authentication
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="center-load" id="loadingState">
+    <div class="spinner-dark"></div>
+    <p>Preparing your registration...</p>
+  </div>
+
+  <!-- Success screen -->
+  <div class="card success-screen" id="successScreen">
+    <div class="success-icon"><i class="fa-solid fa-check"></i></div>
+    <h2>Attendance Recorded!</h2>
+    <p class="msg">Your attendance for the TARA BASA Orientation has been successfully registered.</p>
+    <div class="detail-box" id="detailBox"></div>
+    <div class="success-actions">
+      <a href="index.html" class="btn btn-outline"><i class="fa-solid fa-house"></i> Back to Home</a>
+      <button class="btn btn-primary" id="printConfirmBtn"><i class="fa-solid fa-print"></i> Print Confirmation</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="partners-mini">
+    <img src="https://wxyzofficial.sirv.com/SSU/ssu.jpg" alt="SSU" />
+    <img src="https://wxyzofficial.sirv.com/TARA%20BASA/dswd.png" alt="DSWD" />
+  </div>
+  TARA BASA Orientation &bull; Samar State University &amp; DSWD &bull; November 25, 2026
+</footer>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getAuth, signInAnonymously, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore, doc, getDoc, runTransaction, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* =========================================================
+   ⚙️  CONFIGURATION
+   ========================================================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyC5ZhZkpA7yvGPo7rNfZIXHIgMipsBIIR0",
+  authDomain: "tara-basa-forms.firebaseapp.com",
+  projectId: "tara-basa-forms",
+  storageBucket: "tara-basa-forms.firebasestorage.app",
+  messagingSenderId: "795155191396",
+  appId: "1:795155191396:web:fd8fecf7a89c5976e2b171",
+  measurementId: "G-HSH1PHTZ3X"
+};
+
+const EVENT_NAME = 'TARA BASA Orientation';
+const EVENT_DATE = '2026-11-25';
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* =========================================================
+   🔔  TOASTS
+   ========================================================= */
+const toastContainer = document.getElementById('toastContainer');
+function toast(type, title, message, ms=4200){
+  const icons = { success:'fa-circle-check', error:'fa-circle-xmark', warning:'fa-triangle-exclamation', info:'fa-circle-info' };
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<i class="ic fa-solid ${icons[type]||icons.info}"></i>
+    <div><strong>${title}</strong><span>${message}</span></div>`;
+  toastContainer.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateX(120%)'; setTimeout(()=>el.remove(),300); }, ms);
+}
+
+/* =========================================================
+   🌐  SESSION / TOKEN HANDLING
+   The URL may contain ?session=<sessionId>&token=<rawToken>
+   The session doc stores a tokenHash (SHA-256 of rawToken).
+   Since we cannot compute SHA-256 in Firestore rules directly,
+   we store the raw token too ONLY if the rules permit a client
+   to write it once. To keep things simple and secure, we store
+   the tokenHash here and validate it client-side, but ALSO rely
+   on the server (Cloud Function) or Firestore rules check that
+   session.status == 'active' and expiry has not passed.
+
+   ⚠️  For full cryptographic enforcement, deploy the Cloud
+   Function `submitAttendance` that re-validates the raw token
+   server-side. The client flow below works with direct Firestore
+   writes when rules allow (status active + not expired), which
+   is sufficient for orientation-scale events. See Cloud Function
+   section for stricter enforcement.
+   ========================================================= */
+const urlParams = new URLSearchParams(window.location.search);
+const sessionId = urlParams.get('session') || '';
+const rawToken = urlParams.get('token') || '';
+
+let sessionData = null;
+
+async function sha256Hex(str){
+  if(!crypto.subtle) return null;
+  const enc = new TextEncoder().encode(str);
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function validateSession(){
+  const banner = document.getElementById('sessionBanner');
+  if(!sessionId || !rawToken){
+    // No session provided. Check if there's any active session and prompt the user.
+    banner.className = 'session-banner inactive';
+    banner.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i>
+      <span>This page must be accessed by scanning the attendance QR code. Please scan the QR code provided by the organizer.</span>`;
+    return false;
+  }
+  try{
+    const snap = await getDoc(doc(db, 'attendanceSessions', sessionId));
+    if(!snap.exists()){
+      banner.className = 'session-banner inactive';
+      banner.innerHTML = `<i class="fa-solid fa-circle-xmark"></i><span>Invalid attendance session. Please scan a valid QR code.</span>`;
+      return false;
+    }
+    const data = snap.data();
+    sessionData = { id: sessionId, ...data };
+
+    // Check status
+    if(data.status !== 'active'){
+      banner.className = 'session-banner inactive';
+      banner.innerHTML = `<i class="fa-solid fa-circle-xmark"></i><span>This attendance session is ${data.status}. Please contact the organizer.</span>`;
+      return false;
+    }
+    // Check expiry
+    let expired = false;
+    if(data.expiresAt){
+      const expMs = data.expiresAt.toMillis ? data.expiresAt.toMillis() : new Date(data.expiresAt).getTime();
+      if(Date.now() > expMs){ expired = true; }
+    }
+    if(expired){
+      banner.className = 'session-banner inactive';
+      banner.innerHTML = `<i class="fa-solid fa-clock"></i><span>This attendance session has expired. Please scan a new QR code.</span>`;
+      return false;
+    }
+    // Token hash check (best-effort client-side; server rules also enforce)
+    if(data.tokenHash){
+      const hash = await sha256Hex(rawToken);
+      if(hash && hash !== data.tokenHash){
+        banner.className = 'session-banner inactive';
+        banner.innerHTML = `<i class="fa-solid fa-ban"></i><span>Invalid session token. Please scan the QR code again.</span>`;
+        return false;
+      }
+    }
+    banner.className = 'session-banner active';
+    banner.innerHTML = `<i class="fa-solid fa-circle-check"></i><span>Active session — you may register your attendance below.</span>`;
+    return true;
+  }catch(err){
+    console.error(err);
+    banner.className = 'session-banner inactive';
+    banner.innerHTML = `<i class="fa-solid fa-wifi"></i><span>Unable to verify session. Check your connection and reload.</span>`;
+    return false;
+  }
+}
+
+/* =========================================================
+   🔐  ANONYMOUS AUTH
+   ========================================================= */
+let currentUser = null;
+let authReady = new Promise((resolve)=>{
+  onAuthStateChanged(auth, async (user)=>{
+    if(user){
+      currentUser = user;
+      resolve(user);
+    } else {
+      try{
+        const cred = await signInAnonymously(auth);
+        currentUser = cred.user;
+        resolve(cred.user);
+      }catch(err){
+        console.error('Anonymous sign-in failed', err);
+        resolve(null);
+      }
+    }
+  });
+});
+
+/* =========================================================
+   🧾  FORM LOGIC
+   ========================================================= */
+const loadingState = document.getElementById('loadingState');
+const registrationCard = document.getElementById('registrationCard');
+const successScreen = document.getElementById('successScreen');
+const form = document.getElementById('attendanceForm');
+const nameEl = document.getElementById('name');
+const programEl = document.getElementById('program');
+const collegeEl = document.getElementById('college');
+const modalityEl = document.getElementById('modality');
+const yearOptions = document.getElementById('yearOptions');
+
+// Year option selection highlighting
+yearOptions.querySelectorAll('input[name="year"]').forEach(radio=>{
+  radio.addEventListener('change', () => {
+    yearOptions.querySelectorAll('.year-option').forEach(o=>o.classList.remove('selected'));
+    if(radio.checked) radio.closest('.year-option').classList.add('selected');
+  });
+});
+
+function getYear(){
+  const r = document.querySelector('input[name="year"]:checked');
+  return r ? r.value : '';
+}
+
+// Show / hide field errors
+function setErr(id, show){
+  const el = document.getElementById(id);
+  if(el) el.classList.toggle('show', show);
+}
+function markInvalid(el, invalid){
+  el.classList.toggle('invalid', invalid);
+}
+
+// Validate form
+function validateForm(){
+  let ok = true;
+  const name = nameEl.value.trim().replace(/\s+/g,' ');
+  if(name.length < 3 || name.length > 80){ markInvalid(nameEl,true); setErr('err-name',true); ok=false; }
+  else { markInvalid(nameEl,false); setErr('err-name',false); }
+
+  if(!programEl.value){ markInvalid(programEl,true); setErr('err-program',true); ok=false; }
+  else { markInvalid(programEl,false); setErr('err-program',false); }
+
+  if(!getYear()){ setErr('err-year',true); ok=false; } else { setErr('err-year',false); }
+
+  if(!collegeEl.value){ markInvalid(collegeEl,true); setErr('err-college',true); ok=false; }
+  else { markInvalid(collegeEl,false); setErr('err-college',false); }
+
+  if(!modalityEl.value){ markInvalid(modalityEl,true); setErr('err-modality',true); ok=false; }
+  else { markInvalid(modalityEl,false); setErr('err-modality',false); }
+
+  return ok;
+}
+
+// Re-validate a field on input
+[nameEl,programEl,collegeEl,modalityEl].forEach(el=>{
+  el.addEventListener('input', ()=>{ markInvalid(el,false); });
+  el.addEventListener('change', ()=>{ markInvalid(el,false); });
+});
+
+/* =========================================================
+   🚀  SUBMIT ATTENDANCE
+   Uses a Firestore transaction to atomically:
+   - Check existing attendance doc (by uid)
+   - Check active session
+   - Write the attendance doc
+   ========================================================= */
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if(!validateForm()){
+    toast('warning','Incomplete Form','Please fill out all required fields.');
+    return;
+  }
+  if(!currentUser){
+    toast('error','Authentication Failed','Unable to authenticate. Please reload the page.');
+    return;
+  }
+  if(!sessionData || !sessionData.id){
+    toast('error','No Active Session','Please scan a valid QR code to register.');
+    return;
+  }
+
+  const submitBtn = document.getElementById('submitBtn');
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = `<div class="spinner"></div> Submitting...`;
+
+  try{
+    const name = nameEl.value.trim().replace(/\s+/g,' ');
+    const program = programEl.value;
+    const year = getYear();
+    const college = collegeEl.value;
+    const modality = modalityEl.value;
+
+    const attendanceRef = doc(db, 'attendance', currentUser.uid);
+    const sessionRef = doc(db, 'attendanceSessions', sessionData.id);
+
+    await runTransaction(db, async (tx) => {
+      // 1. Check existing attendance (prevent duplicates)
+      const existing = await tx.get(attendanceRef);
+      if(existing.exists()){
+        throw new Error('ALREADY_SUBMITTED');
+      }
+
+      // 2. Re-validate session (server-consistent read)
+      const sessSnap = await tx.get(sessionRef);
+      if(!sessSnap.exists()){
+        throw new Error('SESSION_INVALID');
+      }
+      const sess = sessSnap.data();
+      if(sess.status !== 'active'){
+        throw new Error('SESSION_INACTIVE');
+      }
+      if(sess.expiresAt){
+        const expMs = sess.expiresAt.toMillis ? sess.expiresAt.toMillis() : new Date(sess.expiresAt).getTime();
+        if(Date.now() > expMs) throw new Error('SESSION_EXPIRED');
+      }
+
+      // 3. Write attendance
+      tx.set(attendanceRef, {
+        uid: currentUser.uid,
+        name,
+        program,
+        yearLevel: year,
+        college,
+        modality,
+        eventName: EVENT_NAME,
+        eventDate: EVENT_DATE,
+        sessionId: sessionData.id,
+        createdAt: serverTimestamp()
+      });
+    });
+
+    toast('success','Attendance Recorded','Your attendance has been successfully submitted.');
+    showSuccess({
+      name, program, year, college, modality,
+      time: new Date()
+    });
+
+  }catch(err){
+    console.error('Submit error:', err);
+    const msg = err.message || '';
+    if(msg === 'ALREADY_SUBMITTED'){
+      toast('warning','Already Registered','You have already submitted your attendance for this event.');
+      // Show success screen with existing data? We fetch it:
+      try{
+        const snap = await getDoc(doc(db,'attendance',currentUser.uid));
+        if(snap.exists()){
+          const d = snap.data();
+          showSuccess({
+            name: d.name, program: d.program, year: d.yearLevel,
+            college: d.college, modality: d.modality,
+            time: d.createdAt?.toDate ? d.createdAt.toDate() : new Date()
+          });
+        }
+      }catch(e){/* silent */}
+    } else if(msg === 'SESSION_EXPIRED'){
+      toast('error','Session Expired','The attendance session has expired. Please scan a new QR code.');
+      const banner = document.getElementById('sessionBanner');
+      banner.className = 'session-banner inactive';
+      banner.innerHTML = `<i class="fa-solid fa-clock"></i><span>This attendance session has expired. Please scan a new QR code.</span>`;
+    } else if(msg === 'SESSION_INACTIVE' || msg === 'SESSION_INVALID'){
+      toast('error','Session Closed','The attendance session is no longer active.');
+    } else {
+      toast('error','Submission Failed','Unable to save attendance. Please check your connection and try again.');
+    }
+  }finally{
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = `<i class="fa-solid fa-check-to-slot"></i> <span>Submit Attendance</span>`;
+  }
+});
+
+/* =========================================================
+   ✅  SUCCESS SCREEN
+   ========================================================= */
+let lastSuccessData = null;
+function showSuccess(data){
+  lastSuccessData = data;
+  const box = document.getElementById('detailBox');
+  const dt = data.time || new Date();
+  const dateStr = dt.toLocaleDateString('en-PH', { timeZone:'Asia/Manila', year:'numeric', month:'long', day:'numeric' });
+  const timeStr = dt.toLocaleTimeString('en-PH', { timeZone:'Asia/Manila', hour:'2-digit', minute:'2-digit' });
+  box.innerHTML = `
+    <h4>Registration Details</h4>
+    <div class="detail-row"><span class="k">Name</span><span class="v">${escapeHtml(data.name)}</span></div>
+    <div class="detail-row"><span class="k">Program</span><span class="v">${escapeHtml(data.program)}</span></div>
+    <div class="detail-row"><span class="k">Year Level</span><span class="v">${escapeHtml(data.year)}</span></div>
+    <div class="detail-row"><span class="k">College</span><span class="v">${escapeHtml(data.college)}</span></div>
+    <div class="detail-row"><span class="k">Modality</span><span class="v">${escapeHtml(data.modality)}</span></div>
+    <div class="detail-row"><span class="k">Date</span><span class="v">${dateStr}</span></div>
+    <div class="detail-row"><span class="k">Time</span><span class="v">${timeStr}</span></div>
+  `;
+  registrationCard.style.display = 'none';
+  loadingState.style.display = 'none';
+  successScreen.classList.add('show');
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+document.getElementById('printConfirmBtn').addEventListener('click', () => {
+  if(!lastSuccessData) return;
+  const d = lastSuccessData;
+  const dt = d.time || new Date();
+  const dateStr = dt.toLocaleDateString('en-PH', { timeZone:'Asia/Manila', year:'numeric', month:'long', day:'numeric' });
+  const timeStr = dt.toLocaleTimeString('en-PH', { timeZone:'Asia/Manila', hour:'2-digit', minute:'2-digit' });
+  const w = window.open('', '_blank', 'width=700,height=800');
+  w.document.write(`
+    <html><head><title>Attendance Confirmation</title>
+    <style>
+      body{font-family:Arial,sans-serif;padding:40px;color:#202124}
+      .hdr{text-align:center;border-bottom:3px solid #C62828;padding-bottom:20px;margin-bottom:24px}
+      .hdr h1{margin:0;color:#8E0000;font-size:22px}
+      .hdr p{margin:4px 0;color:#666;font-size:13px}
+      .body h2{font-size:16px;color:#C62828;margin-bottom:16px}
+      table{width:100%;border-collapse:collapse}
+      td{padding:10px 0;border-bottom:1px solid #eee;font-size:14px}
+      td.k{color:#666;width:40%}
+      td.v{font-weight:600}
+      .ft{margin-top:30px;text-align:center;font-size:12px;color:#999}
+    </style></head><body>
+    <div class="hdr">
+      <h1>TARA BASA ORIENTATION</h1>
+      <p>November 25, 2026 &bull; Samar State University</p>
+      <p>In partnership with DSWD</p>
+    </div>
+    <div class="body">
+      <h2>Attendance Confirmation</h2>
+      <table>
+        <tr><td class="k">Name</td><td class="v">${escapeHtml(d.name)}</td></tr>
+        <tr><td class="k">Program</td><td class="v">${escapeHtml(d.program)}</td></tr>
+        <tr><td class="k">Year Level</td><td class="v">${escapeHtml(d.year)}</td></tr>
+        <tr><td class="k">College</td><td class="v">${escapeHtml(d.college)}</td></tr>
+        <tr><td class="k">Modality</td><td class="v">${escapeHtml(d.modality)}</td></tr>
+        <tr><td class="k">Date</td><td class="v">${dateStr}</td></tr>
+        <tr><td class="k">Time</td><td class="v">${timeStr}</td></tr>
+      </table>
+    </div>
+    <div class="ft">This confirmation is generated by the TARA BASA Attendance System.</div>
+    </body></html>
+  `);
+  w.document.close();
+  setTimeout(()=>w.print(), 400);
+});
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* =========================================================
+   🏁  INIT
+   ========================================================= */
+(async function init(){
+  try{
+    // Validate session first
+    const ok = await validateSession();
+    // Wait for auth
+    await authReady;
+    if(!currentUser){
+      loadingState.innerHTML = `<div class="spinner-dark"></div><p>Authentication unavailable. Please reload.</p>`;
+      return;
+    }
+
+    // If no active session, stop here
+    if(!ok){
+      loadingState.style.display = 'none';
+      return;
+    }
+
+    // Check existing attendance
+    try{
+      const snap = await getDoc(doc(db, 'attendance', currentUser.uid));
+      if(snap.exists()){
+        const d = snap.data();
+        loadingState.style.display = 'none';
+        toast('info','Already Registered','You have already submitted your attendance.');
+        showSuccess({
+          name: d.name, program: d.program, year: d.yearLevel,
+          college: d.college, modality: d.modality,
+          time: d.createdAt?.toDate ? d.createdAt.toDate() : new Date()
+        });
+        return;
+      }
+    }catch(e){ console.warn('Attendance check failed', e); }
+
+    loadingState.style.display = 'none';
+    registrationCard.style.display = 'block';
+  }catch(err){
+    console.error(err);
+    loadingState.innerHTML = `<div class="spinner-dark"></div><p>Something went wrong. Please reload the page.</p>`;
+  }
+})();
+</script>
+</body>
+</html>

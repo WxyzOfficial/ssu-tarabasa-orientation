@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin Login — TARA BASA Orientation</title>
+<link rel="icon" href="https://wxyzofficial.sirv.com/TARA%20BASA/tb_logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+<style>
+  :root{
+    --red:#C62828; --dark-red:#8E0000; --accent:#EF5350;
+    --white:#fff; --bg:#F8F9FB; --text:#202124; --muted:#6B7280;
+    --border:#E5E7EB; --shadow:0 10px 30px rgba(198,40,40,.08);
+    --radius:16px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);
+    min-height:100vh;display:grid;place-items:center;padding:1.5rem;
+    background:
+      radial-gradient(circle at 85% 10%,rgba(198,40,40,.07),transparent 45%),
+      radial-gradient(circle at 10% 90%,rgba(239,83,80,.07),transparent 45%),
+      var(--bg);
+  }
+  a{text-decoration:none;color:inherit}
+  .login-shell{
+    width:100%;max-width:1000px;background:#fff;border-radius:22px;
+    box-shadow:0 25px 60px rgba(32,33,36,.12);overflow:hidden;
+    display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--border);
+  }
+  /* Left panel */
+  .login-aside{
+    background:linear-gradient(150deg,var(--dark-red),var(--red) 70%);
+    color:#fff;padding:3rem 2.5rem;position:relative;overflow:hidden;
+    display:flex;flex-direction:column;justify-content:space-between;
+  }
+  .login-aside::before{
+    content:"";position:absolute;width:340px;height:340px;border-radius:50%;
+    background:rgba(255,255,255,.06);top:-120px;right:-120px;
+  }
+  .login-aside::after{
+    content:"";position:absolute;width:220px;height:220px;border-radius:50%;
+    background:rgba(255,255,255,.05);bottom:-80px;left:-60px;
+  }
+  .aside-brand{display:flex;align-items:center;gap:.8rem;position:relative;z-index:1}
+  .aside-brand img{width:52px;height:52px;object-fit:contain;background:#fff;border-radius:12px;padding:5px}
+  .aside-brand span{font-weight:800;font-size:1.15rem}
+  .aside-content{position:relative;z-index:1;margin-top:2rem}
+  .aside-content h2{font-size:1.7rem;font-weight:800;line-height:1.25;margin-bottom:1rem}
+  .aside-content p{opacity:.85;font-size:.92rem;margin-bottom:2rem}
+  .aside-points{list-style:none;display:flex;flex-direction:column;gap:1rem}
+  .aside-points li{display:flex;gap:.8rem;align-items:flex-start;font-size:.9rem}
+  .aside-points i{color:#ffd6d6;margin-top:.2rem;width:18px}
+  .aside-footer{position:relative;z-index:1;margin-top:2.5rem}
+  .partner-row{display:flex;align-items:center;gap:1rem;margin-top:1.2rem}
+  .partner-row img{height:36px;object-fit:contain;background:#fff;border-radius:8px;padding:3px 6px}
+  /* Right panel */
+  .login-main{padding:3rem 2.5rem;display:flex;flex-direction:column;justify-content:center}
+  .login-main h1{font-size:1.6rem;font-weight:800;margin-bottom:.4rem;letter-spacing:-.02em}
+  .login-main .sub{color:var(--muted);font-size:.9rem;margin-bottom:2rem}
+  .badge-admin{
+    display:inline-flex;align-items:center;gap:.4rem;font-size:.72rem;font-weight:700;
+    background:rgba(198,40,40,.08);color:var(--dark-red);padding:.35rem .8rem;border-radius:50px;
+    text-transform:uppercase;letter-spacing:.06em;margin-bottom:1.2rem;width:fit-content;
+  }
+  .field{margin-bottom:1.2rem}
+  .field label{display:block;font-size:.82rem;font-weight:600;margin-bottom:.4rem;color:var(--text)}
+  .input-wrap{position:relative}
+  .input-wrap i.lead-ic{
+    position:absolute;left:14px;top:50%;transform:translateY(-50%);
+    color:var(--muted);font-size:.9rem;
+  }
+  .input-wrap input{
+    width:100%;padding:.85rem .85rem .85rem 2.6rem;border:1.5px solid var(--border);
+    border-radius:10px;font-size:.92rem;font-family:inherit;transition:.2s;
+    background:#fff;color:var(--text);
+  }
+  .input-wrap input:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 4px rgba(198,40,40,.08)}
+  .toggle-pass{
+    position:absolute;right:12px;top:50%;transform:translateY(-50%);
+    background:none;border:none;color:var(--muted);cursor:pointer;font-size:.95rem;padding:4px;
+  }
+  .toggle-pass:hover{color:var(--red)}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
+    padding:.9rem 1.4rem;border-radius:10px;font-weight:600;font-size:.92rem;
+    border:none;cursor:pointer;transition:.25s;font-family:inherit;width:100%;
+  }
+  .btn-primary{background:var(--red);color:#fff;box-shadow:0 8px 20px rgba(198,40,40,.25)}
+  .btn-primary:hover:not(:disabled){background:var(--dark-red);transform:translateY(-2px)}
+  .btn-primary:disabled{opacity:.65;cursor:not-allowed}
+  .btn-outline{background:transparent;color:var(--dark-red);border:1.5px solid var(--border);width:auto}
+  .btn-outline:hover{border-color:var(--red);color:var(--red)}
+  .spinner{
+    width:16px;height:16px;border:2.5px solid rgba(255,255,255,.4);
+    border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .divider{display:flex;align-items:center;gap:1rem;margin:1.5rem 0;color:var(--muted);font-size:.78rem}
+  .divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--border)}
+  .signup-box{
+    background:var(--bg);border:1px dashed var(--border);border-radius:12px;
+    padding:1rem 1.1rem;display:flex;justify-content:space-between;align-items:center;gap:.8rem;
+  }
+  .signup-box .txt{font-size:.82rem;color:var(--muted)}
+  .signup-box .txt strong{color:var(--text);display:block;font-size:.86rem;margin-bottom:.15rem}
+  .signup-box .btn{padding:.55rem 1rem;font-size:.82rem;width:auto;white-space:nowrap}
+  .back-link{
+    display:inline-flex;align-items:center;gap:.4rem;font-size:.82rem;color:var(--muted);
+    margin-top:2rem;transition:.2s;
+  }
+  .back-link:hover{color:var(--red)}
+  /* Toast */
+  .toast-container{position:fixed;top:1.5rem;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:.7rem;max-width:360px}
+  .toast{
+    background:#fff;border-radius:12px;padding:.9rem 1rem;box-shadow:0 12px 30px rgba(0,0,0,.12);
+    display:flex;gap:.7rem;align-items:flex-start;border-left:4px solid var(--red);
+    animation:slideIn .3s ease;font-size:.88rem;
+  }
+  .toast.success{border-left-color:#16a34a}
+  .toast.error{border-left-color:var(--red)}
+  .toast.warning{border-left-color:#f59e0b}
+  .toast .ic{font-size:1.05rem;margin-top:.1rem}
+  .toast.success .ic{color:#16a34a}
+  .toast.error .ic{color:var(--red)}
+  .toast.warning .ic{color:#f59e0b}
+  .toast strong{display:block;font-size:.86rem;margin-bottom:.1rem}
+  .toast span{color:var(--muted);font-size:.82rem}
+  @keyframes slideIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+  @media(max-width:860px){
+    .login-shell{grid-template-columns:1fr}
+    .login-aside{display:none}
+    .login-main{padding:2.5rem 1.8rem}
+  }
+</style>
+</head>
+<body>
+
+<div class="login-shell">
+  <!-- Left Aside -->
+  <aside class="login-aside">
+    <div class="aside-brand">
+      <img src="https://wxyzofficial.sirv.com/TARA%20BASA/tb_logo.png" alt="TARA BASA" />
+      <span>TARA BASA</span>
+    </div>
+    <div class="aside-content">
+      <h2>Administrator<br/>Control Center</h2>
+      <p>Manage attendance, monitor participation in real time, and generate reports for the TARA BASA Orientation.</p>
+      <ul class="aside-points">
+        <li><i class="fa-solid fa-circle-check"></i> Real-time attendance monitoring</li>
+        <li><i class="fa-solid fa-circle-check"></i> Secure QR session management</li>
+        <li><i class="fa-solid fa-circle-check"></i> Exportable CSV &amp; printable reports</li>
+        <li><i class="fa-solid fa-circle-check"></i> Verified administrator access only</li>
+      </ul>
+    </div>
+    <div class="aside-footer">
+      <p style="font-size:.78rem;opacity:.8">In partnership with</p>
+      <div class="partner-row">
+        <img src="https://wxyzofficial.sirv.com/SSU/ssu.jpg" alt="SSU" />
+        <img src="https://wxyzofficial.sirv.com/TARA%20BASA/dswd.png" alt="DSWD" />
+      </div>
+    </div>
+  </aside>
+
+  <!-- Right Main -->
+  <main class="login-main">
+    <span class="badge-admin"><i class="fa-solid fa-shield-halved"></i> Administrator Access</span>
+    <h1>Sign in to Dashboard</h1>
+    <p class="sub">Authorized personnel only. Please enter your administrator credentials.</p>
+
+    <form id="loginForm" novalidate>
+      <div class="field">
+        <label for="email">Email Address</label>
+        <div class="input-wrap">
+          <i class="fa-solid fa-envelope lead-ic"></i>
+          <input type="email" id="email" autocomplete="email" placeholder="admin@example.com" required />
+        </div>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <div class="input-wrap">
+          <i class="fa-solid fa-lock lead-ic"></i>
+          <input type="password" id="password" autocomplete="current-password" placeholder="Enter password" required />
+          <button type="button" class="toggle-pass" id="togglePass" aria-label="Toggle password visibility">
+            <i class="fa-solid fa-eye"></i>
+          </button>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary" id="loginBtn">
+        <i class="fa-solid fa-right-to-bracket"></i> <span>Sign In</span>
+      </button>
+    </form>
+
+    <div class="divider">or</div>
+
+    <!-- Sign-up box: hidden by default via SIGNUP_ENABLED -->
+    <div class="signup-box" id="signupBox" style="display:none">
+      <div class="txt">
+        <strong>Need an admin account?</strong>
+        Create a new administrator account.
+      </div>
+      <button class="btn btn-outline" id="createAccountBtn">
+        <i class="fa-solid fa-user-plus"></i> Create
+      </button>
+    </div>
+
+    <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to home</a>
+  </main>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Sign-up modal (hidden unless enabled) -->
+<div id="signupModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9998;place-items:center;padding:1rem">
+  <div style="background:#fff;border-radius:18px;max-width:420px;width:100%;padding:2rem;box-shadow:0 25px 60px rgba(0,0,0,.25)">
+    <h3 style="font-size:1.2rem;margin-bottom:.3rem">Create Administrator Account</h3>
+    <p style="color:var(--muted);font-size:.85rem;margin-bottom:1.4rem">The new account will be created in Firebase Auth, but it still requires an <code>admins</code> document to access the dashboard.</p>
+    <div class="field"><label>Email</label><div class="input-wrap"><i class="fa-solid fa-envelope lead-ic"></i><input type="email" id="suEmail" placeholder="admin@example.com"/></div></div>
+    <div class="field"><label>Password</label><div class="input-wrap"><i class="fa-solid fa-lock lead-ic"></i><input type="password" id="suPassword" placeholder="Min 6 characters"/></div></div>
+    <div style="display:flex;gap:.6rem;margin-top:1rem">
+      <button class="btn btn-outline" id="suCancel" style="flex:1">Cancel</button>
+      <button class="btn btn-primary" id="suSubmit" style="flex:1">Create</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged,
+  setPersistence, browserLocalPersistence, createUserWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore, doc, getDoc, setDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* =========================================================
+   ⚙️  CONFIGURATION
+   ========================================================= */
+const SIGNUP_ENABLED = false; // 🔒 Flip to true to allow admin self-registration
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC5ZhZkpA7yvGPo7rNfZIXHIgMipsBIIR0",
+  authDomain: "tara-basa-forms.firebaseapp.com",
+  projectId: "tara-basa-forms",
+  storageBucket: "tara-basa-forms.firebasestorage.app",
+  messagingSenderId: "795155191396",
+  appId: "1:795155191396:web:fd8fecf7a89c5976e2b171",
+  measurementId: "G-HSH1PHTZ3X"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* =========================================================
+   🔔 Toast notifications (no alert/confirm/prompt)
+   ========================================================= */
+const toastContainer = document.getElementById('toastContainer');
+function toast(type, title, message, ms = 4200){
+  const icons = { success:'fa-circle-check', error:'fa-circle-xmark', warning:'fa-triangle-exclamation', info:'fa-circle-info' };
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<i class="ic fa-solid ${icons[type]||icons.info}"></i>
+    <div><strong>${title}</strong><span>${message}</span></div>`;
+  toastContainer.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateX(120%)'; setTimeout(()=>el.remove(),300); }, ms);
+}
+
+/* =========================================================
+   🔐  AUTH FLOW
+   ========================================================= */
+// Enable persistent session so admin stays logged in
+setPersistence(auth, browserLocalPersistence).catch(()=>{});
+
+// UI refs
+const form = document.getElementById('loginForm');
+const emailEl = document.getElementById('email');
+const passEl = document.getElementById('password');
+const loginBtn = document.getElementById('loginBtn');
+const togglePass = document.getElementById('togglePass');
+const signupBox = document.getElementById('signupBox');
+const signupModal = document.getElementById('signupModal');
+const createAccountBtn = document.getElementById('createAccountBtn');
+
+// Show signup if enabled
+if (SIGNUP_ENABLED) {
+  signupBox.style.display = 'flex';
+}
+
+// Password visibility toggle
+togglePass.addEventListener('click', () => {
+  const isPw = passEl.type === 'password';
+  passEl.type = isPw ? 'text' : 'password';
+  togglePass.innerHTML = `<i class="fa-solid ${isPw ? 'fa-eye-slash' : 'fa-eye'}"></i>`;
+});
+
+// Guard: verify admin document exists
+async function isAdmin(uid){
+  try{
+    const snap = await getDoc(doc(db, 'admins', uid));
+    return snap.exists();
+  }catch(err){
+    console.error('Admin check failed:', err);
+    return false;
+  }
+}
+
+// Sign in handler
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = emailEl.value.trim();
+  const password = passEl.value;
+
+  if(!email || !password){
+    toast('warning','Missing Information','Please enter your email and password.');
+    return;
+  }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    toast('warning','Invalid Email','Please enter a valid email address.');
+    return;
+  }
+
+  loginBtn.disabled = true;
+  loginBtn.innerHTML = `<div class="spinner"></div> Signing in...`;
+
+  try{
+    const cred = await signInWithEmailAndPassword(auth, email, password);
+    const authorized = await isAdmin(cred.user.uid);
+    if(!authorized){
+      await signOut(auth);
+      toast('error','Access Denied','This account is not authorized as an administrator.');
+      return;
+    }
+    toast('success','Welcome Back','Redirecting to dashboard...');
+    setTimeout(()=>{ window.location.replace('main.html'); }, 700);
+  }catch(err){
+    console.error(err);
+    const map = {
+      'auth/invalid-credential':'Invalid email or password.',
+      'auth/invalid-email':'Invalid email address format.',
+      'auth/user-disabled':'This account has been disabled.',
+      'auth/too-many-requests':'Too many attempts. Please try again later.',
+      'auth/network-request-failed':'Network error. Check your connection.'
+    };
+    toast('error','Sign-in Failed', map[err.code] || 'Unable to sign in. Please verify your credentials.');
+  }finally{
+    loginBtn.disabled = false;
+    loginBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> <span>Sign In</span>`;
+  }
+});
+
+// Auto-redirect if already authorized
+onAuthStateChanged(auth, async (user) => {
+  if(user){
+    const ok = await isAdmin(user.uid);
+    if(ok){
+      window.location.replace('main.html');
+    }
+  }
+});
+
+/* =========================================================
+   🆕  CREATE ADMIN ACCOUNT (disabled by default)
+   NOTE: Creating a Firebase Auth user is straightforward,
+   but authorizing them (creating the admins doc) requires
+   elevated privileges. Firestore rules prevent self-writing
+   to admins unless the caller is already an admin. So this
+   flow can be used by an EXISTING admin to pre-create an
+   account, but the admins doc must be seeded server-side
+   (or by an authorized admin via a separate UI).
+   ========================================================= */
+if(SIGNUP_ENABLED){
+  createAccountBtn.addEventListener('click', () => {
+    signupModal.style.display = 'grid';
+  });
+  document.getElementById('suCancel').addEventListener('click', () => {
+    signupModal.style.display = 'none';
+  });
+  document.getElementById('suSubmit').addEventListener('click', async () => {
+    const email = document.getElementById('suEmail').value.trim();
+    const password = document.getElementById('suPassword').value;
+    if(!email || password.length < 6){
+      toast('warning','Invalid Input','Provide a valid email and password (min 6 chars).');
+      return;
+    }
+    const suBtn = document.getElementById('suSubmit');
+    suBtn.disabled = true;
+    suBtn.textContent = 'Creating...';
+    try{
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      // NOTE: Firestore rules will block writing to admins unless we're admin.
+      // We try here but expect it may fail — the point is to create the Auth user.
+      try{
+        await setDoc(doc(db,'admins',cred.user.uid), {
+          email, role:'admin', createdAt: serverTimestamp()
+        });
+        toast('success','Account Created','Admin account is now authorized.');
+      }catch(writeErr){
+        toast('warning','Auth Account Created',
+          'Firebase Auth user created, but admins record could not be written. An existing admin must authorize this account.');
+      }
+      signupModal.style.display = 'none';
+    }catch(err){
+      toast('error','Creation Failed', err.message.replace('Firebase: ',''));
+    }finally{
+      suBtn.disabled = false;
+      suBtn.textContent = 'Create';
+    }
+  });
+}
+</script>
+</body>
+</html>

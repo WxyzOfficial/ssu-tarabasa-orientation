@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dashboard — TARA BASA Orientation</title>
+<link rel="icon" href="https://wxyzofficial.sirv.com/TARA%20BASA/tb_logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+<style>
+  :root{
+    --red:#C62828; --dark-red:#8E0000; --accent:#EF5350;
+    --white:#fff; --bg:#F8F9FB; --text:#202124; --muted:#6B7280;
+    --border:#E5E7EB; --shadow:0 10px 30px rgba(198,40,40,.08);
+    --radius:14px;
+    --sidebar-w:260px; --sidebar-w-collapsed:76px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);
+    line-height:1.5;min-height:100vh;
+  }
+  a{text-decoration:none;color:inherit}
+  /* ================= SIDEBAR ================= */
+  aside.sidebar{
+    position:fixed;top:0;left:0;bottom:0;width:var(--sidebar-w);
+    background:#fff;border-right:1px solid var(--border);z-index:100;
+    display:flex;flex-direction:column;transition:width .25s ease;
+  }
+  aside.sidebar.collapsed{width:var(--sidebar-w-collapsed)}
+  .sb-brand{
+    display:flex;align-items:center;gap:.7rem;padding:1.1rem 1.2rem;
+    border-bottom:1px solid var(--border);height:70px;
+  }
+  .sb-brand img{width:38px;height:38px;object-fit:contain;flex-shrink:0}
+  .sb-brand .txt{font-weight:800;color:var(--dark-red);font-size:.95rem;line-height:1.1}
+  .sb-brand .txt small{display:block;font-weight:500;color:var(--muted);font-size:.68rem;margin-top:.15rem}
+  aside.collapsed .sb-brand .txt{display:none}
+  .sb-nav{flex:1;overflow-y:auto;padding:1rem .6rem;display:flex;flex-direction:column;gap:.2rem}
+  .sb-link{
+    display:flex;align-items:center;gap:.8rem;padding:.7rem .85rem;border-radius:10px;
+    font-size:.88rem;font-weight:500;color:var(--muted);transition:.15s;cursor:pointer;
+    border:none;background:none;font-family:inherit;text-align:left;width:100%;
+  }
+  .sb-link i{width:20px;text-align:center;font-size:.95rem;flex-shrink:0}
+  .sb-link:hover{background:rgba(198,40,40,.06);color:var(--red)}
+  .sb-link.active{background:var(--red);color:#fff;box-shadow:0 6px 14px rgba(198,40,40,.25)}
+  aside.collapsed .sb-link .label{display:none}
+  aside.collapsed .sb-link{justify-content:center}
+  .sb-footer{padding:1rem .6rem;border-top:1px solid var(--border)}
+  .sb-logout{color:var(--red)}
+  .sb-logout:hover{background:rgba(198,40,40,.08)}
+  /* ================= MAIN ================= */
+  main.main{margin-left:var(--sidebar-w);transition:margin-left .25s ease;min-height:100vh}
+  main.main.collapsed{margin-left:var(--sidebar-w-collapsed)}
+  .topbar{
+    height:70px;background:#fff;border-bottom:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 1.5rem;position:sticky;top:0;z-index:50;gap:1rem;
+  }
+  .topbar-left{display:flex;align-items:center;gap:1rem}
+  .icon-btn{
+    width:40px;height:40px;border-radius:10px;border:1px solid var(--border);
+    background:#fff;color:var(--muted);cursor:pointer;display:grid;place-items:center;
+    transition:.15s;font-size:.95rem;
+  }
+  .icon-btn:hover{color:var(--red);border-color:var(--red)}
+  .topbar-left h1{font-size:1.05rem;font-weight:700}
+  .topbar-left .crumb{font-size:.75rem;color:var(--muted)}
+  .topbar-right{display:flex;align-items:center;gap:.8rem}
+  .admin-chip{
+    display:flex;align-items:center;gap:.6rem;padding:.4rem .8rem;border-radius:10px;
+    background:var(--bg);border:1px solid var(--border);
+  }
+  .admin-chip .av{
+    width:32px;height:32px;border-radius:50%;background:var(--red);color:#fff;
+    display:grid;place-items:center;font-weight:700;font-size:.85rem;
+  }
+  .admin-chip .meta{font-size:.78rem;line-height:1.2}
+  .admin-chip .meta strong{display:block;color:var(--text)}
+  .admin-chip .meta span{color:var(--muted);font-size:.7rem}
+  .page{padding:1.8rem;max-width:1500px;margin:0 auto}
+  .view{display:none}
+  .view.active{display:block;animation:fadeIn .3s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  /* ================= COMMON ================= */
+  .card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 4px 14px rgba(0,0,0,.02)}
+  .btn{
+    display:inline-flex;align-items:center;gap:.5rem;justify-content:center;
+    padding:.65rem 1.1rem;border-radius:9px;font-weight:600;font-size:.85rem;
+    border:none;cursor:pointer;transition:.2s;font-family:inherit;
+  }
+  .btn-primary{background:var(--red);color:#fff}
+  .btn-primary:hover{background:var(--dark-red)}
+  .btn-outline{background:#fff;color:var(--dark-red);border:1.5px solid var(--border)}
+  .btn-outline:hover{border-color:var(--red);color:var(--red)}
+  .btn-danger{background:#fff;color:var(--red);border:1.5px solid var(--red)}
+  .btn-danger:hover{background:var(--red);color:#fff}
+  .btn-sm{padding:.4rem .7rem;font-size:.78rem}
+  .btn:disabled{opacity:.6;cursor:not-allowed}
+  /* ================= STAT CARDS ================= */
+  .stats-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;
+    margin-bottom:1.5rem;
+  }
+  .stat-card{
+    background:#fff;border:1px solid var(--border);border-radius:var(--radius);
+    padding:1.2rem 1.3rem;position:relative;overflow:hidden;transition:.2s;
+  }
+  .stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+  .stat-card .ic{
+    width:44px;height:44px;border-radius:12px;background:rgba(198,40,40,.08);
+    color:var(--red);display:grid;place-items:center;font-size:1.05rem;margin-bottom:.9rem;
+  }
+  .stat-card .num{font-size:1.8rem;font-weight:800;color:var(--text);line-height:1.1}
+  .stat-card .lbl{font-size:.78rem;color:var(--muted);margin-top:.2rem}
+  .stat-card.accent{background:linear-gradient(135deg,var(--dark-red),var(--red));color:#fff}
+  .stat-card.accent .ic{background:rgba(255,255,255,.2);color:#fff}
+  .stat-card.accent .num,.stat-card.accent .lbl{color:#fff}
+  /* ================= SECTION HEAD ================= */
+  .sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:1rem;margin-bottom:1.2rem;flex-wrap:wrap}
+  .sec-head h2{font-size:1.15rem;font-weight:800;letter-spacing:-.01em}
+  .sec-head p{color:var(--muted);font-size:.85rem}
+  .sec-actions{display:flex;gap:.6rem;flex-wrap:wrap}
+  /* ================= FILTERS ================= */
+  .filters{
+    background:#fff;border:1px solid var(--border);border-radius:var(--radius);
+    padding:1rem;margin-bottom:1rem;display:grid;
+    grid-template-columns:1.6fr repeat(4,1fr) auto;gap:.6rem;
+  }
+  .filters input,.filters select{
+    padding:.6rem .8rem;border:1.5px solid var(--border);border-radius:8px;
+    font-family:inherit;font-size:.82rem;background:#fff;color:var(--text);
+    min-width:0;
+  }
+  .filters input:focus,.filters select:focus{outline:none;border-color:var(--red)}
+  /* ================= TABLE ================= */
+  .table-wrap{
+    background:#fff;border:1px solid var(--border);border-radius:var(--radius);
+    overflow:hidden;
+  }
+  .table-scroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:.83rem;min-width:900px}
+  thead th{
+    background:#fafbfc;color:var(--muted);font-size:.72rem;font-weight:700;
+    text-transform:uppercase;letter-spacing:.05em;text-align:left;
+    padding:.85rem 1rem;border-bottom:1px solid var(--border);white-space:nowrap;
+    cursor:pointer;user-select:none;
+  }
+  thead th:hover{color:var(--red)}
+  tbody td{padding:.8rem 1rem;border-bottom:1px solid #f0f1f3;vertical-align:middle}
+  tbody tr:hover{background:#fafbfc}
+  tbody tr:last-child td{border-bottom:none}
+  .badge{
+    display:inline-block;padding:.2rem .55rem;border-radius:6px;font-size:.7rem;
+    font-weight:600;white-space:nowrap;
+  }
+  .badge-edu{background:rgba(198,40,40,.08);color:var(--dark-red)}
+  .badge-cas{background:rgba(59,130,246,.1);color:#1d4ed8}
+  .badge-face{background:rgba(22,163,74,.1);color:#15803d}
+  .badge-online{background:rgba(245,158,11,.12);color:#b45309}
+  .row-actions{display:flex;gap:.35rem}
+  .row-actions button{
+    width:30px;height:30px;border-radius:7px;border:1px solid var(--border);
+    background:#fff;color:var(--muted);cursor:pointer;transition:.15s;font-size:.78rem;
+    display:grid;place-items:center;
+  }
+  .row-actions button:hover{color:var(--red);border-color:var(--red)}
+  .row-actions .del:hover{background:var(--red);color:#fff;border-color:var(--red)}
+  .table-footer{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:.85rem 1rem;border-top:1px solid var(--border);font-size:.8rem;color:var(--muted);
+    flex-wrap:wrap;gap:.6rem;
+  }
+  .pagination{display:flex;gap:.3rem}
+  .pagination button{
+    min-width:32px;height:32px;padding:0 .5rem;border:1px solid var(--border);
+    background:#fff;border-radius:7px;cursor:pointer;font-size:.78rem;
+    color:var(--muted);font-family:inherit;
+  }
+  .pagination button.active{background:var(--red);color:#fff;border-color:var(--red)}
+  .pagination button:hover:not(.active):not(:disabled){border-color:var(--red);color:var(--red)}
+  .pagination button:disabled{opacity:.4;cursor:not-allowed}
+  .empty-state{
+    padding:4rem 2rem;text-align:center;color:var(--muted);
+  }
+  .empty-state i{font-size:2.5rem;color:var(--border);margin-bottom:1rem;display:block}
+  .empty-state strong{color:var(--text);display:block;margin-bottom:.3rem}
+  /* ================= CHARTS ================= */
+  .charts-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem}
+  .chart-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem}
+  .chart-card h3{font-size:.92rem;font-weight:700;margin-bottom:1rem}
+  .chart-box{position:relative;height:280px}
+  /* ================= QR ================= */
+  .qr-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+  .qr-preview{
+    background:linear-gradient(150deg,var(--dark-red),var(--red));
+    border-radius:var(--radius);padding:2rem;color:#fff;text-align:center;
+    position:relative;overflow:hidden;
+  }
+  .qr-preview::before{content:"";position:absolute;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.06);top:-100px;right:-80px}
+  .qr-preview .qr-brand{display:flex;align-items:center;justify-content:center;gap:.6rem;margin-bottom:1rem;position:relative;z-index:1}
+  .qr-preview .qr-brand img{width:40px;height:40px;background:#fff;border-radius:8px;padding:3px}
+  .qr-preview .qr-brand span{font-weight:800;font-size:.95rem}
+  .qr-canvas-wrap{
+    background:#fff;border-radius:14px;padding:1rem;display:inline-block;
+    margin:.5rem auto 1rem;position:relative;z-index:1;
+  }
+  #qrCanvas{display:block;max-width:100%;height:auto}
+  .qr-status{
+    display:inline-flex;align-items:center;gap:.4rem;padding:.35rem .8rem;border-radius:50px;
+    font-size:.75rem;font-weight:700;background:rgba(255,255,255,.2);margin-bottom:1rem;
+    position:relative;z-index:1;
+  }
+  .qr-link{
+    background:rgba(255,255,255,.15);border-radius:8px;padding:.5rem .7rem;
+    font-size:.72rem;word-break:break-all;position:relative;z-index:1;
+    margin-bottom:1rem;text-align:left;
+  }
+  .qr-actions{display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap;position:relative;z-index:1}
+  .qr-actions .btn{background:#fff;color:var(--dark-red);font-size:.78rem;padding:.5rem .9rem}
+  .qr-actions .btn:hover{background:#ffecec}
+  .qr-panel{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem}
+  .qr-panel h3{font-size:1rem;font-weight:700;margin-bottom:1rem}
+  .qr-panel .field{margin-bottom:1rem}
+  .qr-panel label{display:block;font-size:.8rem;font-weight:600;margin-bottom:.35rem}
+  .qr-panel input[type="datetime-local"],.qr-panel input[type="number"],.qr-panel select{
+    width:100%;padding:.6rem .8rem;border:1.5px solid var(--border);border-radius:8px;
+    font-family:inherit;font-size:.85rem;
+  }
+  .qr-panel input:focus{outline:none;border-color:var(--red)}
+  .session-list{margin-top:1.5rem}
+  .session-item{
+    padding:.8rem 1rem;border:1px solid var(--border);border-radius:10px;
+    margin-bottom:.6rem;display:flex;justify-content:space-between;align-items:center;
+    gap:.8rem;font-size:.8rem;
+  }
+  .session-item .sid{font-family:monospace;font-size:.72rem;color:var(--muted);word-break:break-all}
+  /* ================= EXPORT ================= */
+  .export-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem}
+  .export-card{
+    background:#fff;border:1px solid var(--border);border-radius:var(--radius);
+    padding:1.5rem;
+  }
+  .export-card .ic{
+    width:48px;height:48px;border-radius:12px;background:rgba(198,40,40,.08);
+    color:var(--red);display:grid;place-items:center;font-size:1.15rem;margin-bottom:1rem;
+  }
+  .export-card h3{font-size:.95rem;font-weight:700;margin-bottom:.4rem}
+  .export-card p{font-size:.8rem;color:var(--muted);margin-bottom:1rem}
+  /* ================= SETTINGS ================= */
+  .settings-card{max-width:640px}
+  .setting-row{
+    display:flex;justify-content:space-between;align-items:center;gap:1rem;
+    padding:1rem 0;border-bottom:1px solid var(--border);
+  }
+  .setting-row:last-child{border-bottom:none}
+  .setting-row .lbl strong{display:block;font-size:.88rem}
+  .setting-row .lbl span{font-size:.78rem;color:var(--muted)}
+  /* ================= MODAL ================= */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9998;
+    display:none;place-items:center;padding:1rem;backdrop-filter:blur(2px);
+  }
+  .modal-overlay.show{display:grid}
+  .modal{
+    background:#fff;border-radius:16px;max-width:520px;width:100%;
+    max-height:90vh;overflow-y:auto;box-shadow:0 25px 60px rgba(0,0,0,.25);
+    animation:modalIn .25s ease;
+  }
+  @keyframes modalIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
+  .modal-head{
+    padding:1.3rem 1.5rem;border-bottom:1px solid var(--border);
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .modal-head h3{font-size:1.05rem;font-weight:800}
+  .modal-head .close{
+    background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;
+    width:32px;height:32px;border-radius:8px;display:grid;place-items:center;
+  }
+  .modal-head .close:hover{background:rgba(198,40,40,.08);color:var(--red)}
+  .modal-body{padding:1.5rem}
+  .modal-foot{
+    padding:1rem 1.5rem;border-top:1px solid var(--border);
+    display:flex;justify-content:flex-end;gap:.6rem;
+  }
+  .detail-grid{display:flex;flex-direction:column;gap:.1rem}
+  .detail-grid .row{
+    display:flex;justify-content:space-between;gap:1rem;padding:.7rem 0;
+    border-bottom:1px solid #f0f1f3;font-size:.85rem;
+  }
+  .detail-grid .row:last-child{border-bottom:none}
+  .detail-grid .row .k{color:var(--muted)}
+  .detail-grid .row .v{font-weight:600;text-align:right}
+  /* ================= TOAST ================= */
+  .toast-container{position:fixed;top:1.2rem;right:1.2rem;z-index:9999;display:flex;flex-direction:column;gap:.6rem;max-width:340px}
+  .toast{
+    background:#fff;border-radius:12px;padding:.85rem 1rem;box-shadow:0 12px 30px rgba(0,0,0,.12);
+    display:flex;gap:.7rem;align-items:flex-start;border-left:4px solid var(--red);
+    animation:slideIn .3s ease;font-size:.85rem;
+  }
+  .toast.success{border-left-color:#16a34a}
+  .toast.error{border-left-color:var(--red)}
+  .toast.warning{border-left-color:#f59e0b}
+  .toast .ic{font-size:1rem;margin-top:.1rem}
+  .toast.success .ic{color:#16a34a}
+  .toast.error .ic{color:var(--red)}
+  .toast.warning .ic{color:#f59e0b}
+  .toast strong{display:block;font-size:.82rem;margin-bottom:.1rem}
+  .toast span{color:var(--muted);font-size:.78rem}
+  @keyframes slideIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+  /* ================= LOADER ================= */
+  .center-load{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:3rem 1rem;gap:1rem;color:var(--muted);min-height:300px;
+  }
+  .spin{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite}
+  .spin-sm{width:18px;height:18px;border-width:2.5px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  #appLoader{
+    position:fixed;inset:0;background:var(--bg);z-index:9999;
+    display:grid;place-items:center;
+  }
+  /* ================= RESPONSIVE ================= */
+  .mobile-only{display:none}
+  @media(max-width:1100px){
+    .filters{grid-template-columns:1fr 1fr 1fr}
+    .charts-grid{grid-template-columns:1fr}
+    .qr-grid{grid-template-columns:1fr}
+  }
+  @media(max-width:900px){
+    aside.sidebar{transform:translateX(-100%);width:var(--sidebar-w);transition:transform .25s}
+    aside.sidebar.open{transform:translateX(0)}
+    main.main,main.main.collapsed{margin-left:0}
+    .mobile-only{display:grid}
+    .admin-chip .meta{display:none}
+    .filters{grid-template-columns:1fr 1fr}
+    .filters input[name="search"]{grid-column:1/-1}
+    .page{padding:1rem}
+    .topbar{padding:0 1rem}
+  }
+  @media(max-width:520px){
+    .filters{grid-template-columns:1fr}
+    .sec-actions .btn{flex:1}
+    .topbar-left h1{font-size:.95rem}
+  }
+  /* ================= PRINT ================= */
+  @media print{
+    aside.sidebar,.topbar,.filters,.sec-actions,.table-footer,.row-actions,.pagination{display:none!important}
+    main.main{margin-left:0!important}
+    .page{padding:0}
+    .card,.table-wrap{box-shadow:none;border:none}
+    body{background:#fff}
+    .print-header{display:block!important}
+  }
+  .print-header{display:none;text-align:center;padding-bottom:1rem;border-bottom:2px solid var(--red);margin-bottom:1rem}
+  .print-header h1{font-size:1.2rem;color:var(--dark-red);margin-bottom:.2rem}
+  .print-header p{font-size:.8rem;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<!-- App loader -->
+<div id="appLoader">
+  <div style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:1rem">
+    <img src="https://wxyzofficial.sirv.com/TARA%20BASA/tb_logo.png" alt="TARA BASA" style="width:64px;height:64px;object-fit:contain" />
+    <div class="spin"></div>
+    <p style="color:var(--muted);font-size:.85rem">Verifying administrator access...</p>
+  </div>
+</div>
+
+<!-- ================= SIDEBAR ================= -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-brand">
+    <img src="https://wxyzofficial.sirv.com/TARA%20BASA/tb_logo.png" alt="TARA BASA" />
+    <div class="txt">TARA BASA<small>Admin Console</small></div>
+  </div>
+  <nav class="sb-nav">
+    <button class="sb-link active" data-view="dashboard"><i class="fa-solid fa-gauge-high"></i><span class="label">Dashboard</span></button>
+    <button class="sb-link" data-view="records"><i class="fa-solid fa-users"></i><span class="label">Attendance Records</span></button>
+    <button class="sb-link" data-view="analytics"><i class="fa-solid fa-chart-pie"></i><span class="label">Analytics</span></button>
+    <button class="sb-link" data-view="qr"><i class="fa-solid fa-qrcode"></i><span class="label">QR Generator</span></button>
+    <button class="sb-link" data-view="export"><i class="fa-solid fa-file-export"></i><span class="label">Export Reports</span></button>
+    <button class="sb-link" data-view="settings"><i class="fa-solid fa-gear"></i><span class="label">Settings</span></button>
+  </nav>
+  <div class="sb-footer">
+    <button class="sb-link sb-logout" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i><span class="label">Logout</span></button>
+  </div>
+</aside>
+
+<!-- ================= MAIN ================= -->
+<main class="main" id="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="icon-btn mobile-only" id="menuToggle"><i class="fa-solid fa-bars"></i></button>
+      <button class="icon-btn" id="collapseToggle"><i class="fa-solid fa-bars-staggered"></i></button>
+      <div>
+        <h1 id="pageTitle">Dashboard</h1>
+        <div class="crumb" id="pageCrumb">Overview of attendance metrics</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="admin-chip">
+        <div class="av" id="adminAv">A</div>
+        <div class="meta">
+          <strong id="adminName">Administrator</strong>
+          <span id="adminEmail">admin</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page">
+    <!-- ============ DASHBOARD ============ -->
+    <section class="view active" id="view-dashboard">
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card accent">
+          <div class="ic"><i class="fa-solid fa-user-check"></i></div>
+          <div class="num" id="statTotal">—</div>
+          <div class="lbl">Total Attendance</div>
+        </div>
+        <div class="stat-card">
+          <div class="ic"><i class="fa-solid fa-graduation-cap"></i></div>
+          <div class="num" id="statEdu">—</div>
+          <div class="lbl">College of Education</div>
+        </div>
+        <div class="stat-card">
+          <div class="ic"><i class="fa-solid fa-flask"></i></div>
+          <div class="num" id="statCas">—</div>
+          <div class="lbl">College of Arts &amp; Sciences</div>
+        </div>
+        <div class="stat-card">
+          <div class="ic"><i class="fa-solid fa-building-user"></i></div>
+          <div class="num" id="statFace">—</div>
+          <div class="lbl">Face-to-Face</div>
+        </div>
+        <div class="stat-card">
+          <div class="ic"><i class="fa-solid fa-laptop"></i></div>
+          <div class="num" id="statOnline">—</div>
+          <div class="lbl">Online</div>
+        </div>
+        <div class="stat-card">
+          <div class="ic"><i class="fa-solid fa-list-check"></i></div>
+          <div class="num" id="statPrograms">—</div>
+          <div class="lbl">Programs Represented</div>
+        </div>
+      </div>
+
+      <div class="sec-head">
+        <div><h2>Recent Registrations</h2><p>Latest participants who registered their attendance</p></div>
+        <div class="sec-actions">
+          <button class="btn btn-outline" id="recentRefresh"><i class="fa-solid fa-rotate"></i> Refresh</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th><th>Name</th><th>Program</th><th>Year</th><th>College</th><th>Modality</th><th>Date</th><th>Time</th>
+              </tr>
+            </thead>
+            <tbody id="recentTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ RECORDS ============ -->
+    <section class="view" id="view-records">
+      <div class="sec-head">
+        <div><h2>Attendance Records</h2><p>Search, filter, and manage all participant attendance</p></div>
+        <div class="sec-actions">
+          <button class="btn btn-outline" id="refreshRecords"><i class="fa-solid fa-rotate"></i> Refresh</button>
+          <button class="btn btn-primary" id="exportFilteredBtn"><i class="fa-solid fa-file-csv"></i> Export Filtered</button>
+        </div>
+      </div>
+
+      <div class="filters">
+        <input type="text" name="search" id="fSearch" placeholder="Search by name..." />
+        <select id="fProgram"><option value="">All Programs</option></select>
+        <select id="fYear">
+          <option value="">All Year Levels</option>
+          <option value="2">Year 2</option>
+          <option value="3">Year 3</option>
+          <option value="4">Year 4</option>
+        </select>
+        <select id="fCollege">
+          <option value="">All Colleges</option>
+          <option value="College of Education">College of Education</option>
+          <option value="College of Arts and Sciences">College of Arts and Sciences</option>
+        </select>
+        <select id="fModality">
+          <option value="">All Modalities</option>
+          <option value="Face to face">Face to face</option>
+          <option value="Online">Online</option>
+        </select>
+        <button class="btn btn-outline" id="clearFilters"><i class="fa-solid fa-xmark"></i> Clear</button>
+      </div>
+
+      <div class="print-header">
+        <h1>TARA BASA ORIENTATION — Attendance Report</h1>
+        <p>November 25, 2026 &bull; Samar State University &bull; In partnership with DSWD</p>
+        <p id="printMeta"></p>
+      </div>
+
+      <div class="table-wrap">
+        <div class="table-scroll">
+          <table id="recordsTable">
+            <thead>
+              <tr>
+                <th data-sort="index">#</th>
+                <th data-sort="name">Name <i class="fa-solid fa-sort" style="opacity:.4;font-size:.7rem"></i></th>
+                <th>Program</th>
+                <th>Year</th>
+                <th>College</th>
+                <th>Modality</th>
+                <th data-sort="date">Date <i class="fa-solid fa-sort" style="opacity:.4;font-size:.7rem"></i></th>
+                <th data-sort="time">Time <i class="fa-solid fa-sort" style="opacity:.4;font-size:.7rem"></i></th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="recordsBody"></tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <div id="recordsMeta">0 records</div>
+          <div class="pagination" id="pagination"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ANALYTICS ============ -->
+    <section class="view" id="view-analytics">
+      <div class="sec-head">
+        <div><h2>Attendance Analytics</h2><p>Visual breakdown of participant distribution</p></div>
+      </div>
+      <div class="charts-grid">
+        <div class="chart-card"><h3>Attendance by College</h3><div class="chart-box"><canvas id="chartCollege"></canvas></div></div>
+        <div class="chart-card"><h3>Face-to-Face vs Online</h3><div class="chart-box"><canvas id="chartModality"></canvas></div></div>
+        <div class="chart-card"><h3>Attendance by Program</h3><div class="chart-box"><canvas id="chartProgram"></canvas></div></div>
+        <div class="chart-card"><h3>Year Level Distribution</h3><div class="chart-box"><canvas id="chartYear"></canvas></div></div>
+      </div>
+    </section>
+
+    <!-- ============ QR ============ -->
+    <section class="view" id="view-qr">
+      <div class="sec-head">
+        <div><h2>QR Code Generator</h2><p>Generate secure, time-limited attendance sessions</p></div>
+      </div>
+      <div class="qr-grid">
+        <div class="qr-preview" id="qrPreview">
+          <div class="qr-brand">
+            <img src="https://wxyzofficial.sirv.com/TARA%20BASA/tb_logo.png" alt="TARA BASA" />
+            <span>TARA BASA ORIENTATION</span>
+          </div>
+          <div class="qr-status" id="qrStatus"><i class="fa-solid fa-circle-notch fa-spin"></i> No Active Session</div>
+          <div class="qr-canvas-wrap">
+            <canvas id="qrCanvas" width="260" height="260"></canvas>
+          </div>
+          <div class="qr-link" id="qrLink" style="display:none"></div>
+          <div class="qr-actions">
+            <button class="btn" id="downloadQrBtn"><i class="fa-solid fa-download"></i> Download PNG</button>
+            <button class="btn" id="copyLinkBtn"><i class="fa-solid fa-copy"></i> Copy Link</button>
+            <button class="btn" id="regenerateQrBtn"><i class="fa-solid fa-rotate"></i> Regenerate</button>
+          </div>
+        </div>
+        <div class="qr-panel">
+          <h3>Session Controls</h3>
+          <div class="field">
+            <label>Expiration (optional)</label>
+            <input type="datetime-local" id="qrExpires" />
+          </div>
+          <div class="field">
+            <label>Session Duration preset</label>
+            <select id="qrPreset">
+              <option value="">Custom</option>
+              <option value="1">1 hour</option>
+              <option value="4">4 hours</option>
+              <option value="8">8 hours</option>
+              <option value="24">24 hours</option>
+              <option value="72">3 days</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" id="createSessionBtn" style="width:100%">
+            <i class="fa-solid fa-plus"></i> Generate New Session
+          </button>
+          <div class="session-list">
+            <h3 style="font-size:.85rem;margin:1.2rem 0 .8rem;color:var(--muted)">All Sessions</h3>
+            <div id="sessionsList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ EXPORT ============ -->
+    <section class="view" id="view-export">
+      <div class="sec-head">
+        <div><h2>Export Reports</h2><p>Download attendance data or print official reports</p></div>
+      </div>
+      <div class="export-grid">
+        <div class="export-card">
+          <div class="ic"><i class="fa-solid fa-file-csv"></i></div>
+          <h3>Export All Records (CSV)</h3>
+          <p>Download the complete attendance dataset as a CSV file.</p>
+          <button class="btn btn-primary" id="exportAllCsv"><i class="fa-solid fa-download"></i> Download CSV</button>
+        </div>
+        <div class="export-card">
+          <div class="ic"><i class="fa-solid fa-filter"></i></div>
+          <h3>Export Filtered (CSV)</h3>
+          <p>Export records matching your current filters on the Records page.</p>
+          <button class="btn btn-outline" id="exportFilteredCsv2"><i class="fa-solid fa-download"></i> Download Filtered CSV</button>
+        </div>
+        <div class="export-card">
+          <div class="ic"><i class="fa-solid fa-print"></i></div>
+          <h3>Printable Attendance Report</h3>
+          <p>Generate a clean, print-ready attendance report for official documentation.</p>
+          <button class="btn btn-outline" id="printReportBtn"><i class="fa-solid fa-print"></i> Print Report</button>
+        </div>
+        <div class="export-card">
+          <div class="ic"><i class="fa-solid fa-chart-simple"></i></div>
+          <h3>Statistics Summary</h3>
+          <p>Print a summary report with totals by college, modality, and program.</p>
+          <button class="btn btn-outline" id="printStatsBtn"><i class="fa-solid fa-print"></i> Print Summary</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SETTINGS ============ -->
+    <section class="view" id="view-settings">
+      <div class="sec-head">
+        <div><h2>Settings</h2><p>Account and system information</p></div>
+      </div>
+      <div class="card settings-card" style="padding:1.5rem">
+        <div class="setting-row">
+          <div class="lbl"><strong>Administrator</strong><span id="setAdminEmail">—</span></div>
+          <i class="fa-solid fa-shield-halved" style="color:var(--red)"></i>
+        </div>
+        <div class="setting-row">
+          <div class="lbl"><strong>Event</strong><span>TARA BASA Orientation</span></div>
+          <i class="fa-solid fa-calendar" style="color:var(--red)"></i>
+        </div>
+        <div class="setting-row">
+          <div class="lbl"><strong>Event Date</strong><span>November 25, 2026</span></div>
+          <i class="fa-solid fa-calendar-check" style="color:var(--red)"></i>
+        </div>
+        <div class="setting-row">
+          <div class="lbl"><strong>Firebase Project</strong><span>tara-basa-forms</span></div>
+          <i class="fa-solid fa-fire" style="color:var(--red)"></i>
+        </div>
+        <div class="setting-row">
+          <div class="lbl"><strong>Partners</strong><span>Samar State University &amp; DSWD</span></div>
+          <i class="fa-solid fa-handshake" style="color:var(--red)"></i>
+        </div>
+        <div class="setting-row">
+          <div class="lbl"><strong>Sign Out</strong><span>Securely sign out of the dashboard</span></div>
+          <button class="btn btn-danger btn-sm" id="logoutBtn2"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- ================= MODALS ================= -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-user" style="color:var(--red);margin-right:.4rem"></i> Participant Details</h3>
+      <button class="close" data-close="detailModal"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body"><div class="detail-grid" id="detailGrid"></div></div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" data-close="detailModal">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="confirmTitle"><i class="fa-solid fa-triangle-exclamation" style="color:var(--red);margin-right:.4rem"></i> Confirm</h3>
+      <button class="close" data-close="confirmModal"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body"><p id="confirmMsg" style="font-size:.9rem;color:var(--muted)"></p></div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" data-close="confirmModal">Cancel</button>
+      <button class="btn btn-danger" id="confirmActionBtn">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Chart.js + QRCode libs -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getAuth, onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore, collection, doc, getDoc, getDocs, query, where,
+  orderBy, onSnapshot, deleteDoc, addDoc, updateDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* =========================================================
+   ⚙️  CONFIG
+   ========================================================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyC5ZhZkpA7yvGPo7rNfZIXHIgMipsBIIR0",
+  authDomain: "tara-basa-forms.firebaseapp.com",
+  projectId: "tara-basa-forms",
+  storageBucket: "tara-basa-forms.firebasestorage.app",
+  messagingSenderId: "795155191396",
+  appId: "1:795155191396:web:fd8fecf7a89c5976e2b171",
+  measurementId: "G-HSH1PHTZ3X"
+};
+const EVENT_NAME = 'TARA BASA Orientation';
+const EVENT_DATE = '2026-11-25';
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* =========================================================
+   🔔  TOASTS
+   ========================================================= */
+const toastContainer = document.getElementById('toastContainer');
+function toast(type, title, message, ms=4000){
+  const icons = { success:'fa-circle-check', error:'fa-circle-xmark', warning:'fa-triangle-exclamation', info:'fa-circle-info' };
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<i class="ic fa-solid ${icons[type]||icons.info}"></i><div><strong>${title}</strong><span>${message}</span></div>`;
+  toastContainer.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateX(120%)'; setTimeout(()=>el.remove(),300); }, ms);
+}
+
+/* =========================================================
+   🧰  UTILS
+   ========================================================= */
+function fmtDate(ts){
+  if(!ts) return '—';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleDateString('en-PH',{ timeZone:'Asia/Manila', year:'numeric', month:'short', day:'numeric' });
+}
+function fmtTime(ts){
+  if(!ts) return '—';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleTimeString('en-PH',{ timeZone:'Asia/Manila', hour:'2-digit', minute:'2-digit' });
+}
+function esc(s){ return String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* =========================================================
+   🔐  AUTH GUARD
+   ========================================================= */
+let currentAdmin = null;
+let unsubs = [];
+
+async function isAdmin(uid){
+  try{
+    const snap = await getDoc(doc(db,'admins',uid));
+    return snap.exists() ? snap.data() : null;
+  }catch(e){ console.error(e); return null; }
+}
+
+onAuthStateChanged(auth, async (user)=>{
+  if(!user){ window.location.replace('login.html'); return; }
+  const adminData = await isAdmin(user.uid);
+  if(!adminData){
+    await signOut(auth);
+    window.location.replace('login.html');
+    return;
+  }
+  currentAdmin = { uid:user.uid, email:user.email, ...adminData };
+  document.getElementById('adminEmail').textContent = user.email || '—';
+  document.getElementById('setAdminEmail').textContent = user.email || '—';
+  document.getElementById('adminAv').textContent = (user.email||'A')[0].toUpperCase();
+  document.getElementById('adminName').textContent = adminData.name || 'Administrator';
+  document.getElementById('appLoader').style.display = 'none';
+  initDashboard();
+});
+
+/* =========================================================
+   📊  STATE
+   ========================================================= */
+let allRecords = [];        // raw attendance records
+let filteredRecords = [];   // after filters
+let currentPage = 1;
+const PAGE_SIZE = 15;
+let sortKey = 'date';
+let sortDir = 'desc';
+let filters = { search:'', program:'', year:'', college:'', modality:'' };
+let activeSession = null;
+let charts = {};
+
+/* =========================================================
+   🧭  NAVIGATION
+   ========================================================= */
+const views = {
+  dashboard: { title:'Dashboard', crumb:'Overview of attendance metrics' },
+  records:   { title:'Attendance Records', crumb:'Search, filter, and manage attendance' },
+  analytics: { title:'Analytics', crumb:'Visual attendance breakdown' },
+  qr:        { title:'QR Generator', crumb:'Manage attendance sessions' },
+  export:    { title:'Export Reports', crumb:'Download or print reports' },
+  settings:  { title:'Settings', crumb:'Account and system info' }
+};
+function switchView(name){
+  document.querySelectorAll('.sb-link[data-view]').forEach(b=>{
+    b.classList.toggle('active', b.dataset.view === name);
+  });
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  document.getElementById('pageTitle').textContent = views[name].title;
+  document.getElementById('pageCrumb').textContent = views[name].crumb;
+  // close mobile drawer
+  document.getElementById('sidebar').classList.remove('open');
+}
+document.querySelectorAll('.sb-link[data-view]').forEach(btn=>{
+  btn.addEventListener('click', ()=>switchView(btn.dataset.view));
+});
+
+// Collapse toggle (desktop)
+const sidebar = document.getElementById('sidebar');
+const main = document.getElementById('main');
+document.getElementById('collapseToggle').addEventListener('click', ()=>{
+  if(window.innerWidth <= 900){ sidebar.classList.toggle('open'); }
+  else {
+    sidebar.classList.toggle('collapsed');
+    main.classList.toggle('collapsed');
+  }
+});
+document.getElementById('menuToggle').addEventListener('click', ()=>{
+  sidebar.classList.toggle('open');
+});
+
+/* =========================================================
+   🚀  INIT DASHBOARD
+   ========================================================= */
+async function initDashboard(){
+  setupFilters();
+  setupLogout();
+  subscribeAttendance();
+  subscribeSessions();
+  setupQRHandlers();
+  setupExportHandlers();
+  setupModals();
+  document.getElementById('recentRefresh').addEventListener('click', ()=>toast('info','Refreshed','Attendance data is live.'));
+}
+
+/* =========================================================
+   📡  REAL-TIME ATTENDANCE LISTENER
+   ========================================================= */
+function subscribeAttendance(){
+  const q = query(collection(db,'attendance'), orderBy('createdAt','desc'));
+  const unsub = onSnapshot(q, (snap)=>{
+    allRecords = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+    updateStats();
+    applyFiltersAndRender();
+    updateCharts();
+  }, (err)=>{
+    console.error('attendance listener', err);
+    toast('error','Live Sync Failed','Unable to load attendance records.');
+  });
+  unsubs.push(unsub);
+}
+
+/* =========================================================
+   📈  STATS
+   ========================================================= */
+function updateStats(){
+  const total = allRecords.length;
+  const edu = allRecords.filter(r=>r.college==='College of Education').length;
+  const cas = allRecords.filter(r=>r.college==='College of Arts and Sciences').length;
+  const face = allRecords.filter(r=>r.modality==='Face to face').length;
+  const online = allRecords.filter(r=>r.modality==='Online').length;
+  const programs = new Set(allRecords.map(r=>r.program)).size;
+
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statEdu').textContent = edu;
+  document.getElementById('statCas').textContent = cas;
+  document.getElementById('statFace').textContent = face;
+  document.getElementById('statOnline').textContent = online;
+  document.getElementById('statPrograms').textContent = programs;
+
+  // Recent 5
+  const recent = allRecords.slice(0,5);
+  document.getElementById('recentTableBody').innerHTML = recent.length
+    ? recent.map((r,i)=>`
+      <tr>
+        <td>${i+1}</td>
+        <td>${esc(r.name)}</td>
+        <td>${esc(r.program)}</td>
+        <td>${esc(r.yearLevel)}</td>
+        <td><span class="badge ${r.college==='College of Education'?'badge-edu':'badge-cas'}">${esc(r.college.replace('College of ',''))}</span></td>
+        <td><span class="badge ${r.modality==='Face to face'?'badge-face':'badge-online'}">${esc(r.modality)}</span></td>
+        <td>${fmtDate(r.createdAt)}</td>
+        <td>${fmtTime(r.createdAt)}</td>
+      </tr>`).join('')
+    : `<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-inbox"></i><strong>No registrations yet</strong>Attendance will appear here in real time.</div></td></tr>`;
+}
+
+/* =========================================================
+   🔎  FILTERS
+   ========================================================= */
+function setupFilters(){
+  // Populate program filter
+  const programs = [
+    'Bachelor of Elementary Education',
+    'Bachelor of Early Childhood Education',
+    'Bachelor of Secondary Education (Majors in English)',
+    'Bachelor of Secondary Education (Majors in Mathematics)',
+    'Bachelor of Secondary Education (Majors in Filipino)',
+    'Bachelor of Secondary Education (Majors in Science)',
+    'Bachelor of Secondary Education (Majors in Social Studies)',
+    'Bachelor of Science in Psychology'
+  ];
+  const pSel = document.getElementById('fProgram');
+  programs.forEach(p=>{
+    const o = document.createElement('option'); o.value = p; o.textContent = p; pSel.appendChild(o);
+  });
+
+  document.getElementById('fSearch').addEventListener('input', e=>{ filters.search = e.target.value.trim().toLowerCase(); currentPage=1; applyFiltersAndRender(); });
+  document.getElementById('fProgram').addEventListener('change', e=>{ filters.program = e.target.value; currentPage=1; applyFiltersAndRender(); });
+  document.getElementById('fYear').addEventListener('change', e=>{ filters.year = e.target.value; currentPage=1; applyFiltersAndRender(); });
+  document.getElementById('fCollege').addEventListener('change', e=>{ filters.college = e.target.value; currentPage=1; applyFiltersAndRender(); });
+  document.getElementById('fModality').addEventListener('change', e=>{ filters.modality = e.target.value; currentPage=1; applyFiltersAndRender(); });
+  document.getElementById('clearFilters').addEventListener('click', ()=>{
+    filters = { search:'', program:'', year:'', college:'', modality:'' };
+    document.getElementById('fSearch').value = '';
+    document.getElementById('fProgram').value = '';
+    document.getElementById('fYear').value = '';
+    document.getElementById('fCollege').value = '';
+    document.getElementById('fModality').value = '';
+    currentPage = 1;
+    applyFiltersAndRender();
+  });
+  // Sorting headers
+  document.querySelectorAll('#recordsTable th[data-sort]').forEach(th=>{
+    th.addEventListener('click', ()=>{
+      const k = th.dataset.sort;
+      if(sortKey === k){ sortDir = sortDir === 'asc' ? 'desc' : 'asc'; }
+      else { sortKey = k; sortDir = 'asc'; }
+      applyFiltersAndRender();
+    });
+  });
+}
+
+function applyFiltersAndRender(){
+  filteredRecords = allRecords.filter(r=>{
+    if(filters.search && !(r.name||'').toLowerCase().includes(filters.search)) return false;
+    if(filters.program && r.program !== filters.program) return false;
+    if(filters.year && String(r.yearLevel) !== filters.year) return false;
+    if(filters.college && r.college !== filters.college) return false;
+    if(filters.modality && r.modality !== filters.modality) return false;
+    return true;
+  });
+
+  // sort
+  filteredRecords.sort((a,b)=>{
+    let va, vb;
+    if(sortKey === 'name'){ va = (a.name||'').toLowerCase(); vb = (b.name||'').toLowerCase(); }
+    else if(sortKey === 'date'){ va = a.createdAt?.toMillis?.() || 0; vb = b.createdAt?.toMillis?.() || 0; }
+    else if(sortKey === 'time'){ va = a.createdAt?.toMillis?.() || 0; vb = b.createdAt?.toMillis?.() || 0; }
+    else { va = 0; vb = 0; }
+    if(va < vb) return sortDir==='asc' ? -1 : 1;
+    if(va > vb) return sortDir==='asc' ? 1 : -1;
+    return 0;
+  });
+
+  renderRecordsTable();
+}
+
+function renderRecordsTable(){
+  const total = filteredRecords.length;
+  const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  if(currentPage > pages) currentPage = pages;
+  const start = (currentPage-1)*PAGE_SIZE;
+  const slice = filteredRecords.slice(start, start+PAGE_SIZE);
+
+  const body = document.getElementById('recordsBody');
+  if(slice.length === 0){
+    body.innerHTML = `<tr><td colspan="9"><div class="empty-state"><i class="fa-solid fa-inbox"></i><strong>No matching records</strong>${allRecords.length===0?'No attendance records yet.':'Try adjusting your filters.'}</div></td></tr>`;
+  } else {
+    body.innerHTML = slice.map((r,i)=>{
+      const idx = start + i + 1;
+      return `<tr>
+        <td>${idx}</td>
+        <td><strong>${esc(r.name)}</strong></td>
+        <td style="max-width:220px;font-size:.8rem">${esc(r.program)}</td>
+        <td>${esc(r.yearLevel)}</td>
+        <td><span class="badge ${r.college==='College of Education'?'badge-edu':'badge-cas'}">${esc(r.college.replace('College of ',''))}</span></td>
+        <td><span class="badge ${r.modality==='Face to face'?'badge-face':'badge-online'}">${esc(r.modality)}</span></td>
+        <td>${fmtDate(r.createdAt)}</td>
+        <td>${fmtTime(r.createdAt)}</td>
+        <td><div class="row-actions">
+          <button data-view="${r.id}" title="View details"><i class="fa-solid fa-eye"></i></button>
+          <button class="del" data-del="${r.id}" title="Delete record"><i class="fa-solid fa-trash"></i></button>
+        </div></td>
+      </tr>`;
+    }).join('');
+  }
+
+  // bind row actions
+  body.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>openDetail(b.dataset.view)));
+  body.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>confirmDelete(b.dataset.del)));
+
+  // meta + pagination
+  document.getElementById('recordsMeta').textContent = `${total} record${total!==1?'s':''} • page ${currentPage} of ${pages}`;
+  const pg = document.getElementById('pagination');
+  pg.innerHTML = '';
+  const addBtn = (label, page, disabled, active) => {
+    const b = document.createElement('button');
+    b.textContent = label; b.disabled = !!disabled;
+    if(active) b.classList.add('active');
+    if(!disabled && !active) b.addEventListener('click', ()=>{ currentPage = page; renderRecordsTable(); });
+    pg.appendChild(b);
+  };
+  addBtn('«', 1, currentPage===1, false);
+  const windowStart = Math.max(1, currentPage-2);
+  const windowEnd = Math.min(pages, windowStart+4);
+  for(let p = windowStart; p <= windowEnd; p++) addBtn(p, p, false, p===currentPage);
+  addBtn('»', pages, currentPage===pages, false);
+
+  // update print meta
+  const meta = document.getElementById('printMeta');
+  if(meta) meta.textContent = `Total Participants: ${total}`;
+}
+
+/* =========================================================
+   🪟  MODALS
+   ========================================================= */
+function setupModals(){
+  document.querySelectorAll('[data-close]').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      document.getElementById(b.dataset.close).classList.remove('show');
+    });
+  });
+}
+
+function openDetail(id){
+  const r = allRecords.find(x=>x.id===id);
+  if(!r) return;
+  document.getElementById('detailGrid').innerHTML = `
+    <div class="row"><span class="k">Full Name</span><span class="v">${esc(r.name)}</span></div>
+    <div class="row"><span class="k">Program</span><span class="v">${esc(r.program)}</span></div>
+    <div class="row"><span class="k">Year Level</span><span class="v">${esc(r.yearLevel)}</span></div>
+    <div class="row"><span class="k">College / Department</span><span class="v">${esc(r.college)}</span></div>
+    <div class="row"><span class="k">Modality</span><span class="v">${esc(r.modality)}</span></div>
+    <div class="row"><span class="k">Event</span><span class="v">${esc(r.eventName)}</span></div>
+    <div class="row"><span class="k">Event Date</span><span class="v">${esc(r.eventDate)}</span></div>
+    <div class="row"><span class="k">Attendance Date</span><span class="v">${fmtDate(r.createdAt)}</span></div>
+    <div class="row"><span class="k">Attendance Time</span><span class="v">${fmtTime(r.createdAt)}</span></div>
+    <div class="row"><span class="k">Session ID</span><span class="v" style="font-family:monospace;font-size:.72rem;word-break:break-all">${esc(r.sessionId||'—')}</span></div>
+    <div class="row"><span class="k">UID</span><span class="v" style="font-family:monospace;font-size:.7rem;word-break:break-all">${esc(r.uid)}</span></div>
+  `;
+  document.getElementById('detailModal').classList.add('show');
+}
+
+let pendingDelete = null;
+function confirmDelete(id){
+  pendingDelete = id;
+  const r = allRecords.find(x=>x.id===id);
+  document.getElementById('confirmTitle').innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color:var(--red);margin-right:.4rem"></i> Delete Record`;
+  document.getElementById('confirmMsg').textContent = `Are you sure you want to delete the attendance record for "${r?.name || 'this participant'}"? This action cannot be undone.`;
+  const btn = document.getElementById('confirmActionBtn');
+  btn.textContent = 'Delete Record';
+  btn.onclick = async ()=>{
+    btn.disabled = true; btn.textContent = 'Deleting...';
+    try{
+      await deleteDoc(doc(db,'attendance',pendingDelete));
+      toast('success','Record Deleted','The attendance record has been removed.');
+      document.getElementById('confirmModal').classList.remove('show');
+    }catch(err){
+      console.error(err);
+      toast('error','Delete Failed','Unable to delete the record. Please try again.');
+    }finally{
+      btn.disabled = false; btn.textContent = 'Delete Record';
+      pendingDelete = null;
+    }
+  };
+  document.getElementById('confirmModal').classList.add('show');
+}
+
+/* =========================================================
+   📊  CHARTS
+   ========================================================= */
+function updateCharts(){
+  const collegeCounts = { 'College of Education':0, 'College of Arts and Sciences':0 };
+  const modalityCounts = { 'Face to face':0, 'Online':0 };
+  const programCounts = {};
+  const yearCounts = { '2':0, '3':0, '4':0 };
+  allRecords.forEach(r=>{
+    if(collegeCounts[r.college]!==undefined) collegeCounts[r.college]++;
+    if(modalityCounts[r.modality]!==undefined) modalityCounts[r.modality]++;
+    if(r.program) programCounts[r.program] = (programCounts[r.program]||0)+1;
+    if(yearCounts[r.yearLevel]!==undefined) yearCounts[r.yearLevel]++;
+  });
+
+  if(charts.college){ charts.college.data.datasets[0].data = Object.values(collegeCounts); charts.college.update(); }
+  else {
+    charts.college = new Chart(document.getElementById('chartCollege'), {
+      type:'doughnut',
+      data:{ labels:Object.keys(collegeCounts), datasets:[{ data:Object.values(collegeCounts), backgroundColor:['#C62828','#F59E0B'], borderWidth:0 }] },
+      options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' } }, cutout:'62%' }
+    });
+  }
+
+  if(charts.modality){ charts.modality.data.datasets[0].data = Object.values(modalityCounts); charts.modality.update(); }
+  else {
+    charts.modality = new Chart(document.getElementById('chartModality'), {
+      type:'pie',
+      data:{ labels:Object.keys(modalityCounts), datasets:[{ data:Object.values(modalityCounts), backgroundColor:['#16A34A','#3B82F6'], borderWidth:0 }] },
+      options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' } } }
+    });
+  }
+
+  if(charts.program){ charts.program.data.datasets[0].data = Object.values(programCounts); charts.program.update(); }
+  else {
+    charts.program = new Chart(document.getElementById('chartProgram'), {
+      type:'bar',
+      data:{ labels:Object.keys(programCounts), datasets:[{ label:'Participants', data:Object.values(programCounts), backgroundColor:'#C62828', borderRadius:6 }] },
+      options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } },
+        scales:{ x:{ ticks:{ font:{ size:9 } } }, y:{ beginAtZero:true, ticks:{ precision:0 } } } }
+    });
+  }
+
+  if(charts.year){ charts.year.data.datasets[0].data = Object.values(yearCounts); charts.year.update(); }
+  else {
+    charts.year = new Chart(document.getElementById('chartYear'), {
+      type:'bar',
+      data:{ labels:['2nd Year','3rd Year','4th Year'], datasets:[{ label:'Participants', data:Object.values(yearCounts), backgroundColor:'#8E0000', borderRadius:6 }] },
+      options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } },
+        scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } } }
+    });
+  }
+}
+
+/* =========================================================
+   🎟️  QR SESSIONS
+   ========================================================= */
+function secureToken(len=32){
+  const arr = new Uint8Array(len);
+  crypto.getRandomValues(arr);
+  return Array.from(arr, b => b.toString(16).padStart(2,'0')).join('').slice(0, len);
+}
+function randomId(len=20){
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const arr = new Uint8Array(len);
+  crypto.getRandomValues(arr);
+  return Array.from(arr, b => chars[b % chars.length]).join('');
+}
+async function sha256Hex(str){
+  const enc = new TextEncoder().encode(str);
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+function subscribeSessions(){
+  const q = query(collection(db,'attendanceSessions'), orderBy('createdAt','desc'));
+  const unsub = onSnapshot(q, (snap)=>{
+    const sessions = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+    renderSessionsList(sessions);
+    // find active non-expired
+    activeSession = sessions.find(s=>{
+      if(s.status !== 'active') return false;
+      if(s.expiresAt){
+        const exp = s.expiresAt.toMillis ? s.expiresAt.toMillis() : new Date(s.expiresAt).getTime();
+        if(Date.now() > exp) return false;
+      }
+      return true;
+    }) || null;
+    if(activeSession) renderActiveQR(activeSession);
+    else clearQRDisplay();
+  });
+  unsubs.push(unsub);
+}
+
+function renderActiveQR(s){
+  const rawToken = s.currentToken || ''; // stored only for admin convenience
+  const url = `${location.origin}${location.pathname.replace('main.html','attendance.html')}?session=${encodeURIComponent(s.id)}&token=${encodeURIComponent(rawToken)}`;
+  document.getElementById('qrStatus').innerHTML = `<i class="fa-solid fa-circle-check"></i> Active Session`;
+  document.getElementById('qrLink').style.display = 'block';
+  document.getElementById('qrLink').textContent = url;
+  document.getElementById('qrLink').dataset.url = url;
+
+  const canvas = document.getElementById('qrCanvas');
+  QRCode.toCanvas(canvas, url, { width:260, margin:1, color:{ dark:'#202124', light:'#ffffff' } }, (err)=>{
+    if(err) console.error(err);
+  });
+}
+
+function clearQRDisplay(){
+  document.getElementById('qrStatus').innerHTML = `<i class="fa-solid fa-circle-xmark"></i> No Active Session`;
+  document.getElementById('qrLink').style.display = 'none';
+  document.getElementById('qrLink').textContent = '';
+  const canvas = document.getElementById('qrCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = '#9CA3AF';
+  ctx.font = '13px Inter, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('No active session', canvas.width/2, canvas.height/2);
+}
+
+function renderSessionsList(sessions){
+  const list = document.getElementById('sessionsList');
+  if(!sessions.length){
+    list.innerHTML = `<p style="font-size:.8rem;color:var(--muted)">No sessions created yet.</p>`;
+    return;
+  }
+  list.innerHTML = sessions.slice(0,10).map(s=>{
+    const isActive = s.status === 'active' && (!s.expiresAt || (s.expiresAt.toMillis ? s.expiresAt.toMillis() : new Date(s.expiresAt).getTime()) > Date.now());
+    const badge = isActive ? '<span class="badge badge-face">Active</span>'
+      : s.status === 'active' ? '<span class="badge badge-online">Expired</span>'
+      : `<span class="badge badge-cas">${esc(s.status)}</span>`;
+    return `<div class="session-item">
+      <div>
+        <div style="font-weight:600">${esc(s.id)}</div>
+        <div class="sid">${esc((s.tokenHash||'').slice(0,20))}…</div>
+      </div>
+      ${badge}
+    </div>`;
+  }).join('');
+}
+
+function setupQRHandlers(){
+  document.getElementById('qrPreset').addEventListener('change', (e)=>{
+    const h = parseInt(e.target.value);
+    if(!isNaN(h)){
+      const d = new Date(Date.now() + h*3600*1000);
+      // to local datetime-local string
+      const pad = n=>String(n).padStart(2,'0');
+      const local = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      document.getElementById('qrExpires').value = local;
+    }
+  });
+
+  document.getElementById('createSessionBtn').addEventListener('click', createSession);
+  document.getElementById('regenerateQrBtn').addEventListener('click', createSession);
+
+  document.getElementById('downloadQrBtn').addEventListener('click', ()=>{
+    if(!activeSession){ toast('warning','No Active Session','Generate a session first.'); return; }
+    const canvas = document.getElementById('qrCanvas');
+    const link = document.createElement('a');
+    link.download = `tara-basa-qr-${activeSession.id}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    toast('success','Downloaded','QR code saved as PNG.');
+  });
+
+  document.getElementById('copyLinkBtn').addEventListener('click', async ()=>{
+    const linkEl = document.getElementById('qrLink');
+    const url = linkEl?.dataset?.url;
+    if(!url){ toast('warning','No Link','Generate a session first.'); return; }
+    try{
+      await navigator.clipboard.writeText(url);
+      toast('success','Link Copied','Attendance URL copied to clipboard.');
+    }catch(e){
+      toast('error','Copy Failed','Unable to copy link. Select and copy manually.');
+    }
+  });
+}
+
+async function createSession(){
+  const btn = document.getElementById('createSessionBtn');
+  btn.disabled = true; btn.innerHTML = '<div class="spin spin-sm" style="border-top-color:#fff"></div> Generating...';
+  try{
+    // Deactivate any existing active sessions
+    const snap = await getDocs(query(collection(db,'attendanceSessions'), where('status','==','active')));
+    const updates = [];
+    snap.forEach(d=>{
+      updates.push(updateDoc(doc(db,'attendanceSessions',d.id), { status:'deactivated' }));
+    });
+    await Promise.all(updates);
+
+    const rawToken = secureToken(48);
+    const tokenHash = await sha256Hex(rawToken);
+    const sessionId = randomId(24);
+
+    let expiresAt = null;
+    const expVal = document.getElementById('qrExpires').value;
+    if(expVal){
+      expiresAt = new Date(expVal);
+    } else {
+      // default 24h
+      expiresAt = new Date(Date.now() + 24*3600*1000);
+    }
+
+    const docRef = doc(collection(db,'attendanceSessions'));
+    await (async()=>{
+      // Use setDoc via updateDoc? We'll use addDoc style with fixed ID
+      const { setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+      await setDoc(docRef, {
+        sessionId: docRef.id,
+        tokenHash,
+        currentToken: rawToken, // admin convenience only; rules protect reads
+        eventName: EVENT_NAME,
+        eventDate: EVENT_DATE,
+        status:'active',
+        createdAt: serverTimestamp(),
+        expiresAt: expiresAt,
+        createdBy: currentAdmin.uid
+      });
+    })();
+
+    toast('success','Session Created','New QR session is now active.');
+  }catch(err){
+    console.error(err);
+    toast('error','Generation Failed', err.message.replace('Firebase: ','') || 'Unable to create session.');
+  }finally{
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-plus"></i> Generate New Session';
+  }
+}
+
+/* =========================================================
+   📤  EXPORT
+   ========================================================= */
+function csvEscape(v){ 
+  const s = String(v ?? '');
+  if(/[",\n]/.test(s)) return '"' + s.replace(/"/g,'""') + '"';
+  return s;
+}
+function recordsToCsv(records){
+  const headers = ['#','Name','Program','Year Level','College/Department','Modality','Attendance Date','Attendance Time','Session ID','UID'];
+  const rows = records.map((r,i)=>[
+    i+1, r.name, r.program, r.yearLevel, r.college, r.modality,
+    fmtDate(r.createdAt), fmtTime(r.createdAt), r.sessionId || '', r.uid
+  ]);
+  return [headers, ...rows].map(row=>row.map(csvEscape).join(',')).join('\n');
+}
+function downloadCsv(filename, csv){
+  const blob = new Blob(["\uFEFF" + csv], { type:'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function setupExportHandlers(){
+  const exportAll = ()=> downloadCsv(`tara-basa-attendance-all-${Date.now()}.csv`, recordsToCsv(allRecords));
+  const exportFiltered = ()=> downloadCsv(`tara-basa-attendance-filtered-${Date.now()}.csv`, recordsToCsv(filteredRecords));
+  document.getElementById('exportAllCsv').addEventListener('click', ()=>{ exportAll(); toast('success','Exported','All records downloaded as CSV.'); });
+  document.getElementById('exportFilteredCsv2').addEventListener('click', ()=>{ exportFiltered(); toast('success','Exported','Filtered records downloaded as CSV.'); });
+  document.getElementById('exportFilteredBtn').addEventListener('click', ()=>{ exportFiltered(); toast('success','Exported','Filtered records downloaded as CSV.'); });
+
+  document.getElementById('printReportBtn').addEventListener('click', ()=>printReport(filteredRecords.length ? filteredRecords : allRecords));
+  document.getElementById('printStatsBtn').addEventListener('click', ()=>printStats());
+
+  document.getElementById('refreshRecords').addEventListener('click', ()=>toast('info','Live Data','Records are synced automatically.'));
+}
+
+function printReport(records){
+  const w = window.open('', '_blank', 'width=900,height=800');
+  const rows = records.map((r,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td>${esc(r.name)}</td>
+      <td>${esc(r.program)}</td>
+      <td>${esc(r.yearLevel)}</td>
+      <td>${esc(r.college)}</td>
+      <td>${esc(r.modality)}</td>
+      <td>${fmtDate(r.createdAt)}</td>
+      <td>${fmtTime(r.createdAt)}</td>
+    </tr>`).join('');
+  const edu = records.filter(r=>r.college==='College of Education').length;
+  const cas = records.filter(r=>r.college==='College of Arts and Sciences').length;
+  w.document.write(`
+  <html><head><title>Attendance Report — TARA BASA Orientation</title>
+  <style>
+    body{font-family:Inter,Arial,sans-serif;padding:30px;color:#202124}
+    .hdr{text-align:center;border-bottom:3px solid #C62828;padding-bottom:16px;margin-bottom:20px}
+    .hdr h1{margin:0;color:#8E0000;font-size:20px}
+    .hdr p{margin:3px 0;color:#666;font-size:12px}
+    .meta{display:flex;justify-content:space-between;font-size:12px;margin-bottom:14px;color:#555}
+    table{width:100%;border-collapse:collapse;font-size:11px}
+    th{background:#f5f5f5;text-align:left;padding:7px;border:1px solid #ddd}
+    td{padding:6px 7px;border:1px solid #eee}
+    h2{font-size:14px;color:#C62828;margin:16px 0 8px}
+    .ft{margin-top:24px;text-align:center;font-size:11px;color:#999}
+  </style></head><body>
+    <div class="hdr">
+      <h1>TARA BASA ORIENTATION — ATTENDANCE REPORT</h1>
+      <p>November 25, 2026 &bull; Samar State University &bull; In partnership with DSWD</p>
+    </div>
+    <div class="meta">
+      <span><strong>Total Participants:</strong> ${records.length}</span>
+      <span><strong>College of Education:</strong> ${edu}</span>
+      <span><strong>College of Arts &amp; Sciences:</strong> ${cas}</span>
+      <span><strong>Generated:</strong> ${new Date().toLocaleString('en-PH',{ timeZone:'Asia/Manila' })}</span>
+    </div>
+    <table>
+      <thead><tr><th>#</th><th>Name</th><th>Program</th><th>Year</th><th>College</th><th>Modality</th><th>Date</th><th>Time</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="ft">This report is generated by the TARA BASA Orientation Attendance Management System.</div>
+  </body></html>`);
+  w.document.close();
+  setTimeout(()=>w.print(), 400);
+}
+
+function printStats(){
+  const total = allRecords.length;
+  const byCollege = { 'College of Education':0, 'College of Arts and Sciences':0 };
+  const byModality = { 'Face to face':0, 'Online':0 };
+  const byYear = { '2':0, '3':0, '4':0 };
+  const byProgram = {};
+  allRecords.forEach(r=>{
+    if(byCollege[r.college]!==undefined) byCollege[r.college]++;
+    if(byModality[r.modality]!==undefined) byModality[r.modality]++;
+    if(byYear[r.yearLevel]!==undefined) byYear[r.yearLevel]++;
+    if(r.program) byProgram[r.program]=(byProgram[r.program]||0)+1;
+  });
+  const w = window.open('', '_blank', 'width=800,height=800');
+  w.document.write(`
+  <html><head><title>Summary — TARA BASA</title>
+  <style>
+    body{font-family:Inter,Arial,sans-serif;padding:30px;color:#202124}
+    .hdr{text-align:center;border-bottom:3px solid #C62828;padding-bottom:16px;margin-bottom:20px}
+    .hdr h1{margin:0;color:#8E0000;font-size:20px}
+    .hdr p{margin:3px 0;color:#666;font-size:12px}
+    h2{font-size:14px;color:#C62828;margin:18px 0 8px}
+    table{width:100%;border-collapse:collapse;font-size:12px}
+    th{background:#f5f5f5;text-align:left;padding:8px;border:1px solid #ddd}
+    td{padding:7px 8px;border:1px solid #eee}
+    .total{font-size:26px;color:#C62828;font-weight:800;text-align:center;margin:14px 0}
+  </style></head><body>
+    <div class="hdr"><h1>TARA BASA ORIENTATION — SUMMARY STATISTICS</h1>
+      <p>November 25, 2026 &bull; Samar State University &bull; DSWD</p></div>
+    <div class="total">Total Participants: ${total}</div>
+    <h2>By College</h2>
+    <table><tr><th>College</th><th>Count</th></tr>
+      ${Object.entries(byCollege).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('')}</table>
+    <h2>By Modality</h2>
+    <table><tr><th>Modality</th><th>Count</th></tr>
+      ${Object.entries(byModality).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('')}</table>
+    <h2>By Year Level</h2>
+    <table><tr><th>Year</th><th>Count</th></tr>
+      ${Object.entries(byYear).map(([k,v])=>`<tr><td>Year ${esc(k)}</td><td>${v}</td></tr>`).join('')}</table>
+    <h2>By Program</h2>
+    <table><tr><th>Program</th><th>Count</th></tr>
+      ${Object.entries(byProgram).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('')}</table>
+    <p style="text-align:center;margin-top:24px;font-size:11px;color:#999">Generated ${new Date().toLocaleString('en-PH',{ timeZone:'Asia/Manila' })}</p>
+  </body></html>`);
+  w.document.close();
+  setTimeout(()=>w.print(), 400);
+}
+
+/* =========================================================
+   🚪  LOGOUT
+   ========================================================= */
+function setupLogout(){
+  const doLogout = () => {
+    document.getElementById('confirmTitle').innerHTML = `<i class="fa-solid fa-right-from-bracket" style="color:var(--red);margin-right:.4rem"></i> Sign Out`;
+    document.getElementById('confirmMsg').textContent = 'Are you sure you want to sign out of the administrator dashboard?';
+    const btn = document.getElementById('confirmActionBtn');
+    btn.textContent = 'Sign Out';
+    btn.className = 'btn btn-danger';
+    btn.onclick = async ()=>{
+      btn.disabled = true; btn.textContent = 'Signing out...';
+      try{
+        unsubs.forEach(u=>{ try{u();}catch(e){} });
+        unsubs = [];
+        await signOut(auth);
+        window.location.replace('login.html');
+      }catch(e){
+        toast('error','Logout Failed','Please try again.');
+        btn.disabled = false; btn.textContent = 'Sign Out';
+      }
+    };
+    document.getElementById('confirmModal').classList.add('show');
+  };
+  document.getElementById('logoutBtn').addEventListener('click', doLogout);
+  document.getElementById('logoutBtn2').addEventListener('click', doLogout);
+}
+
+/* Cleanup listeners on unload */
+window.addEventListener('beforeunload', ()=>{
+  unsubs.forEach(u=>{ try{u();}catch(e){} });
+});
+</script>
+</body>
+</html>

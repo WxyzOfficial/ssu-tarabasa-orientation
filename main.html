@@ -127,7 +127,7 @@
   .filters{
     background:#fff;border:1px solid var(--border);border-radius:var(--radius);
     padding:1rem;margin-bottom:1rem;display:grid;
-    grid-template-columns:1.6fr repeat(4,1fr) auto;gap:.6rem;
+    grid-template-columns:1.6fr repeat(5,1fr) auto;gap:.6rem;
   }
   .filters input,.filters select{
     padding:.6rem .8rem;border:1.5px solid var(--border);border-radius:8px;
@@ -141,7 +141,7 @@
     overflow:hidden;
   }
   .table-scroll{overflow-x:auto}
-  table{width:100%;border-collapse:collapse;font-size:.83rem;min-width:900px}
+  table{width:100%;border-collapse:collapse;font-size:.83rem;min-width:1000px}
   thead th{
     background:#fafbfc;color:var(--muted);font-size:.72rem;font-weight:700;
     text-transform:uppercase;letter-spacing:.05em;text-align:left;
@@ -160,6 +160,7 @@
   .badge-cas{background:rgba(59,130,246,.1);color:#1d4ed8}
   .badge-face{background:rgba(22,163,74,.1);color:#15803d}
   .badge-online{background:rgba(245,158,11,.12);color:#b45309}
+  .badge-apply{background:rgba(139,92,246,.1);color:#6d28d9}
   .row-actions{display:flex;gap:.35rem}
   .row-actions button{
     width:30px;height:30px;border-radius:7px;border:1px solid var(--border);
@@ -234,9 +235,19 @@
   .session-item{
     padding:.8rem 1rem;border:1px solid var(--border);border-radius:10px;
     margin-bottom:.6rem;display:flex;justify-content:space-between;align-items:center;
-    gap:.8rem;font-size:.8rem;
+    gap:.8rem;font-size:.8rem;transition:.15s;cursor:pointer;
   }
+  .session-item:hover{border-color:var(--red);background:#fffafa}
+  .session-item.selected{border-color:var(--red);background:rgba(198,40,40,.04);box-shadow:0 0 0 3px rgba(198,40,40,.08)}
+  .session-item .s-meta{flex:1;min-width:0}
   .session-item .sid{font-family:monospace;font-size:.72rem;color:var(--muted);word-break:break-all}
+  .session-item .s-actions{display:flex;gap:.3rem;flex-shrink:0}
+  .session-item .s-actions button{
+    width:30px;height:30px;border-radius:7px;border:1px solid var(--border);
+    background:#fff;color:var(--muted);cursor:pointer;font-size:.75rem;
+    display:grid;place-items:center;transition:.15s;
+  }
+  .session-item .s-actions button:hover{color:var(--red);border-color:var(--red)}
   /* ================= EXPORT ================= */
   .export-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem}
   .export-card{
@@ -445,6 +456,16 @@
           <div class="num" id="statPrograms">—</div>
           <div class="lbl">Programs Represented</div>
         </div>
+        <div class="stat-card">
+          <div class="ic"><i class="fa-solid fa-user-plus"></i></div>
+          <div class="num" id="statTutor">—</div>
+          <div class="lbl">Tutor Applicants</div>
+        </div>
+        <div class="stat-card">
+          <div class="ic"><i class="fa-solid fa-user-graduate"></i></div>
+          <div class="num" id="statYDW">—</div>
+          <div class="lbl">YDW Applicants</div>
+        </div>
       </div>
 
       <div class="sec-head">
@@ -458,7 +479,7 @@
           <table>
             <thead>
               <tr>
-                <th>#</th><th>Name</th><th>Program</th><th>Year</th><th>College</th><th>Modality</th><th>Date</th><th>Time</th>
+                <th>#</th><th>Name</th><th>Program</th><th>Year</th><th>College</th><th>Modality</th><th>Applying</th><th>Date</th><th>Time</th>
               </tr>
             </thead>
             <tbody id="recentTableBody"></tbody>
@@ -496,6 +517,11 @@
           <option value="Face to face">Face to face</option>
           <option value="Online">Online</option>
         </select>
+        <select id="fApplying">
+          <option value="">All Applying</option>
+          <option value="Tutor">Tutor</option>
+          <option value="YDW">YDW</option>
+        </select>
         <button class="btn btn-outline" id="clearFilters"><i class="fa-solid fa-xmark"></i> Clear</button>
       </div>
 
@@ -516,6 +542,7 @@
                 <th>Year</th>
                 <th>College</th>
                 <th>Modality</th>
+                <th>Applying</th>
                 <th data-sort="date">Date <i class="fa-solid fa-sort" style="opacity:.4;font-size:.7rem"></i></th>
                 <th data-sort="time">Time <i class="fa-solid fa-sort" style="opacity:.4;font-size:.7rem"></i></th>
                 <th>Actions</th>
@@ -541,13 +568,14 @@
         <div class="chart-card"><h3>Face-to-Face vs Online</h3><div class="chart-box"><canvas id="chartModality"></canvas></div></div>
         <div class="chart-card"><h3>Attendance by Program</h3><div class="chart-box"><canvas id="chartProgram"></canvas></div></div>
         <div class="chart-card"><h3>Year Level Distribution</h3><div class="chart-box"><canvas id="chartYear"></canvas></div></div>
+        <div class="chart-card"><h3>Applying For (Tutor vs YDW)</h3><div class="chart-box"><canvas id="chartApplying"></canvas></div></div>
       </div>
     </section>
 
     <!-- ============ QR ============ -->
     <section class="view" id="view-qr">
       <div class="sec-head">
-        <div><h2>QR Code Generator</h2><p>Generate secure, time-limited attendance sessions</p></div>
+        <div><h2>QR Code Generator</h2><p>Generate secure, time-limited attendance sessions and share them</p></div>
       </div>
       <div class="qr-grid">
         <div class="qr-preview" id="qrPreview">
@@ -561,9 +589,10 @@
           </div>
           <div class="qr-link" id="qrLink" style="display:none"></div>
           <div class="qr-actions">
-            <button class="btn" id="downloadQrBtn"><i class="fa-solid fa-download"></i> Download PNG</button>
+            <button class="btn" id="shareBtn"><i class="fa-solid fa-share-nodes"></i> Share</button>
             <button class="btn" id="copyLinkBtn"><i class="fa-solid fa-copy"></i> Copy Link</button>
-            <button class="btn" id="regenerateQrBtn"><i class="fa-solid fa-rotate"></i> Regenerate</button>
+            <button class="btn" id="downloadQrBtn"><i class="fa-solid fa-download"></i> Download PNG</button>
+            <button class="btn" id="regenerateQrBtn"><i class="fa-solid fa-rotate"></i> New Session</button>
           </div>
         </div>
         <div class="qr-panel">
@@ -587,7 +616,7 @@
             <i class="fa-solid fa-plus"></i> Generate New Session
           </button>
           <div class="session-list">
-            <h3 style="font-size:.85rem;margin:1.2rem 0 .8rem;color:var(--muted)">All Sessions</h3>
+            <h3 style="font-size:.85rem;margin:1.2rem 0 .8rem;color:var(--muted)">All Sessions (tap to share)</h3>
             <div id="sessionsList"></div>
           </div>
         </div>
@@ -621,7 +650,7 @@
         <div class="export-card">
           <div class="ic"><i class="fa-solid fa-chart-simple"></i></div>
           <h3>Statistics Summary</h3>
-          <p>Print a summary report with totals by college, modality, and program.</p>
+          <p>Print a summary report with totals by college, modality, applying for, and program.</p>
           <button class="btn btn-outline" id="printStatsBtn"><i class="fa-solid fa-print"></i> Print Summary</button>
         </div>
       </div>
@@ -690,6 +719,30 @@
   </div>
 </div>
 
+<!-- Share modal -->
+<div class="modal-overlay" id="shareModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-share-nodes" style="color:var(--red);margin-right:.4rem"></i> Share Attendance Link</h3>
+      <button class="close" data-close="shareModal"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:.6rem;margin-bottom:1rem;flex-wrap:wrap">
+        <button class="btn btn-outline btn-sm" id="shareWhatsapp" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
+        <button class="btn btn-outline btn-sm" id="shareTelegram" title="Telegram"><i class="fa-brands fa-telegram"></i> Telegram</button>
+        <button class="btn btn-outline btn-sm" id="shareEmail" title="Email"><i class="fa-solid fa-envelope"></i> Email</button>
+        <button class="btn btn-outline btn-sm" id="shareFacebook" title="Facebook"><i class="fa-brands fa-facebook"></i> Facebook</button>
+      </div>
+      <div style="margin-bottom:.6rem;font-size:.8rem;color:var(--muted)">Direct link</div>
+      <input type="text" id="shareLinkInput" readonly style="width:100%;padding:.6rem .8rem;border:1.5px solid var(--border);border-radius:8px;font-size:.78rem;font-family:monospace" />
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" data-close="shareModal">Close</button>
+      <button class="btn btn-primary" id="shareCopyBtn"><i class="fa-solid fa-copy"></i> Copy Link</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast-container" id="toastContainer"></div>
 
 <!-- Chart.js + QRCode libs -->
@@ -703,7 +756,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
   getFirestore, collection, doc, getDoc, getDocs, query, where,
-  orderBy, onSnapshot, deleteDoc, addDoc, updateDoc, serverTimestamp
+  orderBy, onSnapshot, deleteDoc, addDoc, updateDoc, setDoc, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 /* =========================================================
@@ -752,6 +805,10 @@ function fmtTime(ts){
   return d.toLocaleTimeString('en-PH',{ timeZone:'Asia/Manila', hour:'2-digit', minute:'2-digit' });
 }
 function esc(s){ return String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function applyBadge(v){
+  const val = v || '—';
+  return `<span class="badge badge-apply">${esc(val)}</span>`;
+}
 
 /* =========================================================
    🔐  AUTH GUARD
@@ -786,14 +843,16 @@ onAuthStateChanged(auth, async (user)=>{
 /* =========================================================
    📊  STATE
    ========================================================= */
-let allRecords = [];        // raw attendance records
-let filteredRecords = [];   // after filters
+let allRecords = [];
+let filteredRecords = [];
 let currentPage = 1;
 const PAGE_SIZE = 15;
 let sortKey = 'date';
 let sortDir = 'desc';
-let filters = { search:'', program:'', year:'', college:'', modality:'' };
+let filters = { search:'', program:'', year:'', college:'', modality:'', applying:'' };
 let activeSession = null;
+let allSessions = [];
+let selectedSession = null;   // session currently shown in QR preview
 let charts = {};
 
 /* =========================================================
@@ -815,14 +874,12 @@ function switchView(name){
   document.getElementById('view-'+name).classList.add('active');
   document.getElementById('pageTitle').textContent = views[name].title;
   document.getElementById('pageCrumb').textContent = views[name].crumb;
-  // close mobile drawer
   document.getElementById('sidebar').classList.remove('open');
 }
 document.querySelectorAll('.sb-link[data-view]').forEach(btn=>{
   btn.addEventListener('click', ()=>switchView(btn.dataset.view));
 });
 
-// Collapse toggle (desktop)
 const sidebar = document.getElementById('sidebar');
 const main = document.getElementById('main');
 document.getElementById('collapseToggle').addEventListener('click', ()=>{
@@ -847,6 +904,7 @@ async function initDashboard(){
   setupQRHandlers();
   setupExportHandlers();
   setupModals();
+  setupShareModal();
   document.getElementById('recentRefresh').addEventListener('click', ()=>toast('info','Refreshed','Attendance data is live.'));
 }
 
@@ -877,6 +935,8 @@ function updateStats(){
   const face = allRecords.filter(r=>r.modality==='Face to face').length;
   const online = allRecords.filter(r=>r.modality==='Online').length;
   const programs = new Set(allRecords.map(r=>r.program)).size;
+  const tutor = allRecords.filter(r=>r.applying==='Tutor').length;
+  const ydw = allRecords.filter(r=>r.applying==='YDW').length;
 
   document.getElementById('statTotal').textContent = total;
   document.getElementById('statEdu').textContent = edu;
@@ -884,8 +944,9 @@ function updateStats(){
   document.getElementById('statFace').textContent = face;
   document.getElementById('statOnline').textContent = online;
   document.getElementById('statPrograms').textContent = programs;
+  document.getElementById('statTutor').textContent = tutor;
+  document.getElementById('statYDW').textContent = ydw;
 
-  // Recent 5
   const recent = allRecords.slice(0,5);
   document.getElementById('recentTableBody').innerHTML = recent.length
     ? recent.map((r,i)=>`
@@ -894,19 +955,19 @@ function updateStats(){
         <td>${esc(r.name)}</td>
         <td>${esc(r.program)}</td>
         <td>${esc(r.yearLevel)}</td>
-        <td><span class="badge ${r.college==='College of Education'?'badge-edu':'badge-cas'}">${esc(r.college.replace('College of ',''))}</span></td>
+        <td><span class="badge ${r.college==='College of Education'?'badge-edu':'badge-cas'}">${esc((r.college||'').replace('College of ',''))}</span></td>
         <td><span class="badge ${r.modality==='Face to face'?'badge-face':'badge-online'}">${esc(r.modality)}</span></td>
+        <td>${applyBadge(r.applying)}</td>
         <td>${fmtDate(r.createdAt)}</td>
         <td>${fmtTime(r.createdAt)}</td>
       </tr>`).join('')
-    : `<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-inbox"></i><strong>No registrations yet</strong>Attendance will appear here in real time.</div></td></tr>`;
+    : `<tr><td colspan="9"><div class="empty-state"><i class="fa-solid fa-inbox"></i><strong>No registrations yet</strong>Attendance will appear here in real time.</div></td></tr>`;
 }
 
 /* =========================================================
    🔎  FILTERS
    ========================================================= */
 function setupFilters(){
-  // Populate program filter
   const programs = [
     'Bachelor of Elementary Education',
     'Bachelor of Early Childhood Education',
@@ -927,17 +988,18 @@ function setupFilters(){
   document.getElementById('fYear').addEventListener('change', e=>{ filters.year = e.target.value; currentPage=1; applyFiltersAndRender(); });
   document.getElementById('fCollege').addEventListener('change', e=>{ filters.college = e.target.value; currentPage=1; applyFiltersAndRender(); });
   document.getElementById('fModality').addEventListener('change', e=>{ filters.modality = e.target.value; currentPage=1; applyFiltersAndRender(); });
+  document.getElementById('fApplying').addEventListener('change', e=>{ filters.applying = e.target.value; currentPage=1; applyFiltersAndRender(); });
   document.getElementById('clearFilters').addEventListener('click', ()=>{
-    filters = { search:'', program:'', year:'', college:'', modality:'' };
+    filters = { search:'', program:'', year:'', college:'', modality:'', applying:'' };
     document.getElementById('fSearch').value = '';
     document.getElementById('fProgram').value = '';
     document.getElementById('fYear').value = '';
     document.getElementById('fCollege').value = '';
     document.getElementById('fModality').value = '';
+    document.getElementById('fApplying').value = '';
     currentPage = 1;
     applyFiltersAndRender();
   });
-  // Sorting headers
   document.querySelectorAll('#recordsTable th[data-sort]').forEach(th=>{
     th.addEventListener('click', ()=>{
       const k = th.dataset.sort;
@@ -955,10 +1017,10 @@ function applyFiltersAndRender(){
     if(filters.year && String(r.yearLevel) !== filters.year) return false;
     if(filters.college && r.college !== filters.college) return false;
     if(filters.modality && r.modality !== filters.modality) return false;
+    if(filters.applying && r.applying !== filters.applying) return false;
     return true;
   });
 
-  // sort
   filteredRecords.sort((a,b)=>{
     let va, vb;
     if(sortKey === 'name'){ va = (a.name||'').toLowerCase(); vb = (b.name||'').toLowerCase(); }
@@ -982,7 +1044,7 @@ function renderRecordsTable(){
 
   const body = document.getElementById('recordsBody');
   if(slice.length === 0){
-    body.innerHTML = `<tr><td colspan="9"><div class="empty-state"><i class="fa-solid fa-inbox"></i><strong>No matching records</strong>${allRecords.length===0?'No attendance records yet.':'Try adjusting your filters.'}</div></td></tr>`;
+    body.innerHTML = `<tr><td colspan="10"><div class="empty-state"><i class="fa-solid fa-inbox"></i><strong>No matching records</strong>${allRecords.length===0?'No attendance records yet.':'Try adjusting your filters.'}</div></td></tr>`;
   } else {
     body.innerHTML = slice.map((r,i)=>{
       const idx = start + i + 1;
@@ -991,8 +1053,9 @@ function renderRecordsTable(){
         <td><strong>${esc(r.name)}</strong></td>
         <td style="max-width:220px;font-size:.8rem">${esc(r.program)}</td>
         <td>${esc(r.yearLevel)}</td>
-        <td><span class="badge ${r.college==='College of Education'?'badge-edu':'badge-cas'}">${esc(r.college.replace('College of ',''))}</span></td>
+        <td><span class="badge ${r.college==='College of Education'?'badge-edu':'badge-cas'}">${esc((r.college||'').replace('College of ',''))}</span></td>
         <td><span class="badge ${r.modality==='Face to face'?'badge-face':'badge-online'}">${esc(r.modality)}</span></td>
+        <td>${applyBadge(r.applying)}</td>
         <td>${fmtDate(r.createdAt)}</td>
         <td>${fmtTime(r.createdAt)}</td>
         <td><div class="row-actions">
@@ -1003,11 +1066,9 @@ function renderRecordsTable(){
     }).join('');
   }
 
-  // bind row actions
   body.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>openDetail(b.dataset.view)));
   body.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>confirmDelete(b.dataset.del)));
 
-  // meta + pagination
   document.getElementById('recordsMeta').textContent = `${total} record${total!==1?'s':''} • page ${currentPage} of ${pages}`;
   const pg = document.getElementById('pagination');
   pg.innerHTML = '';
@@ -1024,7 +1085,6 @@ function renderRecordsTable(){
   for(let p = windowStart; p <= windowEnd; p++) addBtn(p, p, false, p===currentPage);
   addBtn('»', pages, currentPage===pages, false);
 
-  // update print meta
   const meta = document.getElementById('printMeta');
   if(meta) meta.textContent = `Total Participants: ${total}`;
 }
@@ -1049,6 +1109,7 @@ function openDetail(id){
     <div class="row"><span class="k">Year Level</span><span class="v">${esc(r.yearLevel)}</span></div>
     <div class="row"><span class="k">College / Department</span><span class="v">${esc(r.college)}</span></div>
     <div class="row"><span class="k">Modality</span><span class="v">${esc(r.modality)}</span></div>
+    <div class="row"><span class="k">Applying For</span><span class="v">${esc(r.applying || '—')}</span></div>
     <div class="row"><span class="k">Event</span><span class="v">${esc(r.eventName)}</span></div>
     <div class="row"><span class="k">Event Date</span><span class="v">${esc(r.eventDate)}</span></div>
     <div class="row"><span class="k">Attendance Date</span><span class="v">${fmtDate(r.createdAt)}</span></div>
@@ -1090,11 +1151,13 @@ function confirmDelete(id){
 function updateCharts(){
   const collegeCounts = { 'College of Education':0, 'College of Arts and Sciences':0 };
   const modalityCounts = { 'Face to face':0, 'Online':0 };
+  const applyingCounts = { 'Tutor':0, 'YDW':0 };
   const programCounts = {};
   const yearCounts = { '2':0, '3':0, '4':0 };
   allRecords.forEach(r=>{
     if(collegeCounts[r.college]!==undefined) collegeCounts[r.college]++;
     if(modalityCounts[r.modality]!==undefined) modalityCounts[r.modality]++;
+    if(applyingCounts[r.applying]!==undefined) applyingCounts[r.applying]++;
     if(r.program) programCounts[r.program] = (programCounts[r.program]||0)+1;
     if(yearCounts[r.yearLevel]!==undefined) yearCounts[r.yearLevel]++;
   });
@@ -1136,17 +1199,27 @@ function updateCharts(){
         scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } } }
     });
   }
+
+  if(charts.applying){ charts.applying.data.datasets[0].data = Object.values(applyingCounts); charts.applying.update(); }
+  else {
+    charts.applying = new Chart(document.getElementById('chartApplying'), {
+      type:'bar',
+      data:{ labels:['Tutor','YDW'], datasets:[{ label:'Applicants', data:Object.values(applyingCounts), backgroundColor:['#6d28d9','#C62828'], borderRadius:6 }] },
+      options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } },
+        scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } } }
+    });
+  }
 }
 
 /* =========================================================
    🎟️  QR SESSIONS
    ========================================================= */
-function secureToken(len=32){
+function secureToken(len=48){
   const arr = new Uint8Array(len);
   crypto.getRandomValues(arr);
   return Array.from(arr, b => b.toString(16).padStart(2,'0')).join('').slice(0, len);
 }
-function randomId(len=20){
+function randomId(len=24){
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   const arr = new Uint8Array(len);
   crypto.getRandomValues(arr);
@@ -1158,13 +1231,18 @@ async function sha256Hex(str){
   return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 
+function buildAttendanceUrl(session){
+  const rawToken = session.currentToken || '';
+  const path = location.pathname.replace('main.html','attendance.html');
+  return `${location.origin}${path}?session=${encodeURIComponent(session.id)}&token=${encodeURIComponent(rawToken)}`;
+}
+
 function subscribeSessions(){
   const q = query(collection(db,'attendanceSessions'), orderBy('createdAt','desc'));
   const unsub = onSnapshot(q, (snap)=>{
-    const sessions = snap.docs.map(d=>({ id:d.id, ...d.data() }));
-    renderSessionsList(sessions);
+    allSessions = snap.docs.map(d=>({ id:d.id, ...d.data() }));
     // find active non-expired
-    activeSession = sessions.find(s=>{
+    activeSession = allSessions.find(s=>{
       if(s.status !== 'active') return false;
       if(s.expiresAt){
         const exp = s.expiresAt.toMillis ? s.expiresAt.toMillis() : new Date(s.expiresAt).getTime();
@@ -1172,30 +1250,55 @@ function subscribeSessions(){
       }
       return true;
     }) || null;
-    if(activeSession) renderActiveQR(activeSession);
+
+    // Auto-select active session unless user has already selected one
+    if(!selectedSession || (selectedSession.id !== (activeSession?.id) && !allSessions.find(x=>x.id===selectedSession.id))){
+      selectedSession = activeSession || allSessions[0] || null;
+    } else {
+      // refresh selected session data from latest snapshot
+      const fresh = allSessions.find(x=>x.id===selectedSession.id);
+      if(fresh) selectedSession = fresh;
+    }
+
+    renderSessionsList(allSessions);
+    if(selectedSession) renderSessionQR(selectedSession);
     else clearQRDisplay();
   });
   unsubs.push(unsub);
 }
 
-function renderActiveQR(s){
-  const rawToken = s.currentToken || ''; // stored only for admin convenience
-  const url = `${location.origin}${location.pathname.replace('main.html','attendance.html')}?session=${encodeURIComponent(s.id)}&token=${encodeURIComponent(rawToken)}`;
-  document.getElementById('qrStatus').innerHTML = `<i class="fa-solid fa-circle-check"></i> Active Session`;
-  document.getElementById('qrLink').style.display = 'block';
-  document.getElementById('qrLink').textContent = url;
-  document.getElementById('qrLink').dataset.url = url;
+function renderSessionQR(s){
+  const url = buildAttendanceUrl(s);
+  const isActive = s.status === 'active' && (!s.expiresAt || (s.expiresAt.toMillis ? s.expiresAt.toMillis() : new Date(s.expiresAt).getTime()) > Date.now());
+
+  const statusEl = document.getElementById('qrStatus');
+  if(isActive){
+    statusEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> Active Session`;
+  } else if(s.status === 'active'){
+    statusEl.innerHTML = `<i class="fa-solid fa-clock"></i> Expired Session`;
+  } else {
+    statusEl.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> ${esc(s.status)}`;
+  }
+
+  const linkEl = document.getElementById('qrLink');
+  linkEl.style.display = 'block';
+  linkEl.textContent = url;
+  linkEl.dataset.url = url;
 
   const canvas = document.getElementById('qrCanvas');
   QRCode.toCanvas(canvas, url, { width:260, margin:1, color:{ dark:'#202124', light:'#ffffff' } }, (err)=>{
-    if(err) console.error(err);
+    if(err) console.error('QR render error', err);
   });
+
+  // If the session is not active, tint the QR area subtly
+  document.getElementById('qrPreview').style.opacity = isActive ? '1' : '.85';
 }
 
 function clearQRDisplay(){
-  document.getElementById('qrStatus').innerHTML = `<i class="fa-solid fa-circle-xmark"></i> No Active Session`;
+  document.getElementById('qrStatus').innerHTML = `<i class="fa-solid fa-circle-xmark"></i> No Session Selected`;
   document.getElementById('qrLink').style.display = 'none';
   document.getElementById('qrLink').textContent = '';
+  document.getElementById('qrLink').dataset.url = '';
   const canvas = document.getElementById('qrCanvas');
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -1203,7 +1306,8 @@ function clearQRDisplay(){
   ctx.fillStyle = '#9CA3AF';
   ctx.font = '13px Inter, sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText('No active session', canvas.width/2, canvas.height/2);
+  ctx.fillText('No session', canvas.width/2, canvas.height/2);
+  document.getElementById('qrPreview').style.opacity = '1';
 }
 
 function renderSessionsList(sessions){
@@ -1212,19 +1316,94 @@ function renderSessionsList(sessions){
     list.innerHTML = `<p style="font-size:.8rem;color:var(--muted)">No sessions created yet.</p>`;
     return;
   }
-  list.innerHTML = sessions.slice(0,10).map(s=>{
+  list.innerHTML = sessions.slice(0,15).map(s=>{
     const isActive = s.status === 'active' && (!s.expiresAt || (s.expiresAt.toMillis ? s.expiresAt.toMillis() : new Date(s.expiresAt).getTime()) > Date.now());
     const badge = isActive ? '<span class="badge badge-face">Active</span>'
       : s.status === 'active' ? '<span class="badge badge-online">Expired</span>'
       : `<span class="badge badge-cas">${esc(s.status)}</span>`;
-    return `<div class="session-item">
-      <div>
-        <div style="font-weight:600">${esc(s.id)}</div>
-        <div class="sid">${esc((s.tokenHash||'').slice(0,20))}…</div>
+    const sel = selectedSession && selectedSession.id === s.id ? ' selected' : '';
+    return `<div class="session-item${sel}" data-session="${esc(s.id)}">
+      <div class="s-meta">
+        <div style="font-weight:600;font-family:monospace;font-size:.76rem;word-break:break-all">${esc(s.id)}</div>
+        <div class="sid">${esc((s.tokenHash||'').slice(0,24))}…</div>
+        <div style="margin-top:.3rem">${badge}</div>
       </div>
-      ${badge}
+      <div class="s-actions">
+        <button data-act="share" data-id="${esc(s.id)}" title="Share link"><i class="fa-solid fa-share-nodes"></i></button>
+        <button data-act="select" data-id="${esc(s.id)}" title="Show QR"><i class="fa-solid fa-qrcode"></i></button>
+      </div>
     </div>`;
   }).join('');
+
+  // wire up
+  list.querySelectorAll('.session-item').forEach(el=>{
+    el.addEventListener('click', (e)=>{
+      if(e.target.closest('button')) return;
+      const id = el.dataset.session;
+      const s = allSessions.find(x=>x.id===id);
+      if(s){ selectedSession = s; renderSessionsList(allSessions); renderSessionQR(s); }
+    });
+  });
+  list.querySelectorAll('button[data-act]').forEach(b=>{
+    b.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const id = b.dataset.id;
+      const s = allSessions.find(x=>x.id===id);
+      if(!s) return;
+      if(b.dataset.act === 'select'){
+        selectedSession = s; renderSessionsList(allSessions); renderSessionQR(s);
+        document.getElementById('qrCanvas').scrollIntoView({behavior:'smooth', block:'center'});
+      } else if(b.dataset.act === 'share'){
+        selectedSession = s; renderSessionsList(allSessions); renderSessionQR(s);
+        openShareModal(buildAttendanceUrl(s));
+      }
+    });
+  });
+}
+
+async function createSession(){
+  const btn = document.getElementById('createSessionBtn');
+  btn.disabled = true;
+  const original = btn.innerHTML;
+  btn.innerHTML = `<div class="spin spin-sm" style="border-top-color:#fff"></div> Creating...`;
+  try{
+    const id = randomId(20);
+    const rawToken = secureToken(48);
+    const tokenHash = await sha256Hex(rawToken);
+
+    let expiresAt = null;
+    const expVal = document.getElementById('qrExpires').value;
+    if(expVal){
+      const d = new Date(expVal);
+      if(!isNaN(d.getTime())) expiresAt = d;
+    }
+
+    const payload = {
+      status:'active',
+      tokenHash,
+      currentToken: rawToken,   // stored so the admin can rebuild the shareable URL
+      createdAt: serverTimestamp(),
+      createdBy: currentAdmin?.uid || null,
+      expiresAt: expiresAt ? expiresAt : null,
+      eventName: EVENT_NAME,
+      eventDate: EVENT_DATE
+    };
+
+    await setDoc(doc(db,'attendanceSessions',id), payload);
+    toast('success','Session Created','A new attendance session is now active.');
+    document.getElementById('qrExpires').value = '';
+    document.getElementById('qrPreset').value = '';
+    // select the newly created session immediately
+    selectedSession = { id, ...payload };
+    renderSessionsList(allSessions.length ? allSessions : [selectedSession]);
+    renderSessionQR(selectedSession);
+  }catch(err){
+    console.error(err);
+    toast('error','Create Failed','Unable to create a new session. Please try again.');
+  }finally{
+    btn.disabled = false;
+    btn.innerHTML = original;
+  }
 }
 
 function setupQRHandlers(){
@@ -1232,7 +1411,6 @@ function setupQRHandlers(){
     const h = parseInt(e.target.value);
     if(!isNaN(h)){
       const d = new Date(Date.now() + h*3600*1000);
-      // to local datetime-local string
       const pad = n=>String(n).padStart(2,'0');
       const local = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
       document.getElementById('qrExpires').value = local;
@@ -1243,246 +1421,171 @@ function setupQRHandlers(){
   document.getElementById('regenerateQrBtn').addEventListener('click', createSession);
 
   document.getElementById('downloadQrBtn').addEventListener('click', ()=>{
-    if(!activeSession){ toast('warning','No Active Session','Generate a session first.'); return; }
+    if(!selectedSession){ toast('warning','No Session','Select or create a session first.'); return; }
     const canvas = document.getElementById('qrCanvas');
     const link = document.createElement('a');
-    link.download = `tara-basa-qr-${activeSession.id}.png`;
+    link.download = `tara-basa-qr-${selectedSession.id}.png`;
     link.href = canvas.toDataURL('image/png');
     link.click();
-    toast('success','Downloaded','QR code saved as PNG.');
+    toast('success','Downloaded','QR code image saved.');
   });
 
-  document.getElementById('copyLinkBtn').addEventListener('click', async ()=>{
-    const linkEl = document.getElementById('qrLink');
-    const url = linkEl?.dataset?.url;
-    if(!url){ toast('warning','No Link','Generate a session first.'); return; }
-    try{
-      await navigator.clipboard.writeText(url);
-      toast('success','Link Copied','Attendance URL copied to clipboard.');
-    }catch(e){
-      toast('error','Copy Failed','Unable to copy link. Select and copy manually.');
-    }
+  document.getElementById('copyLinkBtn').addEventListener('click', ()=>{
+    const url = document.getElementById('qrLink').dataset.url;
+    if(!url){ toast('warning','No Link','No session link available.'); return; }
+    navigator.clipboard.writeText(url).then(()=>toast('success','Copied','Attendance link copied to clipboard.'))
+      .catch(()=>toast('error','Copy Failed','Please copy the link manually.'));
   });
-}
 
-async function createSession(){
-  const btn = document.getElementById('createSessionBtn');
-  btn.disabled = true; btn.innerHTML = '<div class="spin spin-sm" style="border-top-color:#fff"></div> Generating...';
-  try{
-    // Deactivate any existing active sessions
-    const snap = await getDocs(query(collection(db,'attendanceSessions'), where('status','==','active')));
-    const updates = [];
-    snap.forEach(d=>{
-      updates.push(updateDoc(doc(db,'attendanceSessions',d.id), { status:'deactivated' }));
-    });
-    await Promise.all(updates);
-
-    const rawToken = secureToken(48);
-    const tokenHash = await sha256Hex(rawToken);
-    const sessionId = randomId(24);
-
-    let expiresAt = null;
-    const expVal = document.getElementById('qrExpires').value;
-    if(expVal){
-      expiresAt = new Date(expVal);
-    } else {
-      // default 24h
-      expiresAt = new Date(Date.now() + 24*3600*1000);
-    }
-
-    const docRef = doc(collection(db,'attendanceSessions'));
-    await (async()=>{
-      // Use setDoc via updateDoc? We'll use addDoc style with fixed ID
-      const { setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
-      await setDoc(docRef, {
-        sessionId: docRef.id,
-        tokenHash,
-        currentToken: rawToken, // admin convenience only; rules protect reads
-        eventName: EVENT_NAME,
-        eventDate: EVENT_DATE,
-        status:'active',
-        createdAt: serverTimestamp(),
-        expiresAt: expiresAt,
-        createdBy: currentAdmin.uid
-      });
-    })();
-
-    toast('success','Session Created','New QR session is now active.');
-  }catch(err){
-    console.error(err);
-    toast('error','Generation Failed', err.message.replace('Firebase: ','') || 'Unable to create session.');
-  }finally{
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fa-solid fa-plus"></i> Generate New Session';
-  }
+  document.getElementById('shareBtn').addEventListener('click', ()=>{
+    const url = document.getElementById('qrLink').dataset.url;
+    if(!url){ toast('warning','No Link','No session link available.'); return; }
+    openShareModal(url);
+  });
 }
 
 /* =========================================================
-   📤  EXPORT
+   🔗  SHARE MODAL
    ========================================================= */
-function csvEscape(v){ 
+function setupShareModal(){
+  const input = document.getElementById('shareLinkInput');
+  const close = ()=>document.getElementById('shareModal').classList.remove('show');
+
+  document.getElementById('shareCopyBtn').addEventListener('click', ()=>{
+    navigator.clipboard.writeText(input.value).then(()=>toast('success','Copied','Link copied to clipboard.'))
+      .catch(()=>toast('error','Copy Failed','Please copy manually.'));
+  });
+  document.getElementById('shareWhatsapp').addEventListener('click', ()=>{
+    window.open(`https://wa.me/?text=${encodeURIComponent(input.value)}`,'_blank');
+  });
+  document.getElementById('shareTelegram').addEventListener('click', ()=>{
+    window.open(`https://t.me/share/url?url=${encodeURIComponent(input.value)}`,'_blank');
+  });
+  document.getElementById('shareEmail').addEventListener('click', ()=>{
+    window.location.href = `mailto:?subject=${encodeURIComponent('TARA BASA Orientation Attendance')}&body=${encodeURIComponent(input.value)}`;
+  });
+  document.getElementById('shareFacebook').addEventListener('click', ()=>{
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(input.value)}`,'_blank');
+  });
+}
+
+function openShareModal(url){
+  document.getElementById('shareLinkInput').value = url;
+  document.getElementById('shareModal').classList.add('show');
+}
+
+/* =========================================================
+   📤  EXPORT HANDLERS
+   ========================================================= */
+function csvEscape(v){
   const s = String(v ?? '');
   if(/[",\n]/.test(s)) return '"' + s.replace(/"/g,'""') + '"';
   return s;
 }
-function recordsToCsv(records){
-  const headers = ['#','Name','Program','Year Level','College/Department','Modality','Attendance Date','Attendance Time','Session ID','UID'];
+
+function downloadCsv(records, filename){
+  const headers = ['No','Name','Program','Year Level','College','Modality','Applying For','Event','Event Date','Attendance Date','Attendance Time','Session ID','UID'];
   const rows = records.map((r,i)=>[
-    i+1, r.name, r.program, r.yearLevel, r.college, r.modality,
-    fmtDate(r.createdAt), fmtTime(r.createdAt), r.sessionId || '', r.uid
+    i+1,
+    r.name || '',
+    r.program || '',
+    r.yearLevel || '',
+    r.college || '',
+    r.modality || '',
+    r.applying || '',
+    r.eventName || EVENT_NAME,
+    r.eventDate || EVENT_DATE,
+    fmtDate(r.createdAt),
+    fmtTime(r.createdAt),
+    r.sessionId || '',
+    r.uid || ''
   ]);
-  return [headers, ...rows].map(row=>row.map(csvEscape).join(',')).join('\n');
-}
-function downloadCsv(filename, csv){
-  const blob = new Blob(["\uFEFF" + csv], { type:'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
+  const csv = [headers, ...rows].map(row=>row.map(csvEscape).join(',')).join('\r\n');
+  const blob = new Blob(['\uFEFF'+csv], { type:'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  link.click();
+  setTimeout(()=>URL.revokeObjectURL(link.href), 1500);
 }
 
 function setupExportHandlers(){
-  const exportAll = ()=> downloadCsv(`tara-basa-attendance-all-${Date.now()}.csv`, recordsToCsv(allRecords));
-  const exportFiltered = ()=> downloadCsv(`tara-basa-attendance-filtered-${Date.now()}.csv`, recordsToCsv(filteredRecords));
-  document.getElementById('exportAllCsv').addEventListener('click', ()=>{ exportAll(); toast('success','Exported','All records downloaded as CSV.'); });
-  document.getElementById('exportFilteredCsv2').addEventListener('click', ()=>{ exportFiltered(); toast('success','Exported','Filtered records downloaded as CSV.'); });
-  document.getElementById('exportFilteredBtn').addEventListener('click', ()=>{ exportFiltered(); toast('success','Exported','Filtered records downloaded as CSV.'); });
-
-  document.getElementById('printReportBtn').addEventListener('click', ()=>printReport(filteredRecords.length ? filteredRecords : allRecords));
-  document.getElementById('printStatsBtn').addEventListener('click', ()=>printStats());
-
-  document.getElementById('refreshRecords').addEventListener('click', ()=>toast('info','Live Data','Records are synced automatically.'));
-}
-
-function printReport(records){
-  const w = window.open('', '_blank', 'width=900,height=800');
-  const rows = records.map((r,i)=>`
-    <tr>
-      <td>${i+1}</td>
-      <td>${esc(r.name)}</td>
-      <td>${esc(r.program)}</td>
-      <td>${esc(r.yearLevel)}</td>
-      <td>${esc(r.college)}</td>
-      <td>${esc(r.modality)}</td>
-      <td>${fmtDate(r.createdAt)}</td>
-      <td>${fmtTime(r.createdAt)}</td>
-    </tr>`).join('');
-  const edu = records.filter(r=>r.college==='College of Education').length;
-  const cas = records.filter(r=>r.college==='College of Arts and Sciences').length;
-  w.document.write(`
-  <html><head><title>Attendance Report — TARA BASA Orientation</title>
-  <style>
-    body{font-family:Inter,Arial,sans-serif;padding:30px;color:#202124}
-    .hdr{text-align:center;border-bottom:3px solid #C62828;padding-bottom:16px;margin-bottom:20px}
-    .hdr h1{margin:0;color:#8E0000;font-size:20px}
-    .hdr p{margin:3px 0;color:#666;font-size:12px}
-    .meta{display:flex;justify-content:space-between;font-size:12px;margin-bottom:14px;color:#555}
-    table{width:100%;border-collapse:collapse;font-size:11px}
-    th{background:#f5f5f5;text-align:left;padding:7px;border:1px solid #ddd}
-    td{padding:6px 7px;border:1px solid #eee}
-    h2{font-size:14px;color:#C62828;margin:16px 0 8px}
-    .ft{margin-top:24px;text-align:center;font-size:11px;color:#999}
-  </style></head><body>
-    <div class="hdr">
-      <h1>TARA BASA ORIENTATION — ATTENDANCE REPORT</h1>
-      <p>November 25, 2026 &bull; Samar State University &bull; In partnership with DSWD</p>
-    </div>
-    <div class="meta">
-      <span><strong>Total Participants:</strong> ${records.length}</span>
-      <span><strong>College of Education:</strong> ${edu}</span>
-      <span><strong>College of Arts &amp; Sciences:</strong> ${cas}</span>
-      <span><strong>Generated:</strong> ${new Date().toLocaleString('en-PH',{ timeZone:'Asia/Manila' })}</span>
-    </div>
-    <table>
-      <thead><tr><th>#</th><th>Name</th><th>Program</th><th>Year</th><th>College</th><th>Modality</th><th>Date</th><th>Time</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>
-    <div class="ft">This report is generated by the TARA BASA Orientation Attendance Management System.</div>
-  </body></html>`);
-  w.document.close();
-  setTimeout(()=>w.print(), 400);
-}
-
-function printStats(){
-  const total = allRecords.length;
-  const byCollege = { 'College of Education':0, 'College of Arts and Sciences':0 };
-  const byModality = { 'Face to face':0, 'Online':0 };
-  const byYear = { '2':0, '3':0, '4':0 };
-  const byProgram = {};
-  allRecords.forEach(r=>{
-    if(byCollege[r.college]!==undefined) byCollege[r.college]++;
-    if(byModality[r.modality]!==undefined) byModality[r.modality]++;
-    if(byYear[r.yearLevel]!==undefined) byYear[r.yearLevel]++;
-    if(r.program) byProgram[r.program]=(byProgram[r.program]||0)+1;
+  document.getElementById('exportAllCsv').addEventListener('click', ()=>{
+    if(!allRecords.length){ toast('warning','No Data','There are no records to export.'); return; }
+    downloadCsv(allRecords, `tara-basa-attendance-all-${new Date().toISOString().slice(0,10)}.csv`);
+    toast('success','Export Started','Downloading all attendance records.');
   });
-  const w = window.open('', '_blank', 'width=800,height=800');
-  w.document.write(`
-  <html><head><title>Summary — TARA BASA</title>
-  <style>
-    body{font-family:Inter,Arial,sans-serif;padding:30px;color:#202124}
-    .hdr{text-align:center;border-bottom:3px solid #C62828;padding-bottom:16px;margin-bottom:20px}
-    .hdr h1{margin:0;color:#8E0000;font-size:20px}
-    .hdr p{margin:3px 0;color:#666;font-size:12px}
-    h2{font-size:14px;color:#C62828;margin:18px 0 8px}
-    table{width:100%;border-collapse:collapse;font-size:12px}
-    th{background:#f5f5f5;text-align:left;padding:8px;border:1px solid #ddd}
-    td{padding:7px 8px;border:1px solid #eee}
-    .total{font-size:26px;color:#C62828;font-weight:800;text-align:center;margin:14px 0}
-  </style></head><body>
-    <div class="hdr"><h1>TARA BASA ORIENTATION — SUMMARY STATISTICS</h1>
-      <p>November 25, 2026 &bull; Samar State University &bull; DSWD</p></div>
-    <div class="total">Total Participants: ${total}</div>
-    <h2>By College</h2>
-    <table><tr><th>College</th><th>Count</th></tr>
-      ${Object.entries(byCollege).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('')}</table>
-    <h2>By Modality</h2>
-    <table><tr><th>Modality</th><th>Count</th></tr>
-      ${Object.entries(byModality).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('')}</table>
-    <h2>By Year Level</h2>
-    <table><tr><th>Year</th><th>Count</th></tr>
-      ${Object.entries(byYear).map(([k,v])=>`<tr><td>Year ${esc(k)}</td><td>${v}</td></tr>`).join('')}</table>
-    <h2>By Program</h2>
-    <table><tr><th>Program</th><th>Count</th></tr>
-      ${Object.entries(byProgram).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('')}</table>
-    <p style="text-align:center;margin-top:24px;font-size:11px;color:#999">Generated ${new Date().toLocaleString('en-PH',{ timeZone:'Asia/Manila' })}</p>
-  </body></html>`);
-  w.document.close();
-  setTimeout(()=>w.print(), 400);
+  const exportFiltered = ()=>{
+    if(!filteredRecords.length){ toast('warning','No Data','No records match the current filters.'); return; }
+    downloadCsv(filteredRecords, `tara-basa-attendance-filtered-${new Date().toISOString().slice(0,10)}.csv`);
+    toast('success','Export Started','Downloading filtered attendance records.');
+  };
+  document.getElementById('exportFilteredCsv2').addEventListener('click', exportFiltered);
+  document.getElementById('exportFilteredBtn').addEventListener('click', ()=>{ switchView('records'); exportFiltered(); });
+
+  document.getElementById('printReportBtn').addEventListener('click', ()=>{
+    switchView('records');
+    setTimeout(()=>window.print(), 300);
+  });
+
+  document.getElementById('printStatsBtn').addEventListener('click', ()=>{
+    const total = allRecords.length;
+    const byCollege = {};
+    const byModality = {};
+    const byApplying = {};
+    const byProgram = {};
+    const byYear = {};
+    allRecords.forEach(r=>{
+      byCollege[r.college] = (byCollege[r.college]||0)+1;
+      byModality[r.modality] = (byModality[r.modality]||0)+1;
+      byApplying[r.applying] = (byApplying[r.applying]||0)+1;
+      byProgram[r.program] = (byProgram[r.program]||0)+1;
+      byYear[r.yearLevel] = (byYear[r.yearLevel]||0)+1;
+    });
+    const section = (title, obj)=>{
+      const rows = Object.entries(obj).map(([k,v])=>`<tr><td>${esc(k)}</td><td style="text-align:right">${v}</td></tr>`).join('');
+      return `<h3 style="margin:1.2rem 0 .4rem;color:#8E0000">${title}</h3><table style="width:100%;border-collapse:collapse;font-size:13px">${rows}</table>`;
+    };
+    const w = window.open('', '_blank', 'width=800,height=900');
+    w.document.write(`
+      <html><head><title>Attendance Summary</title>
+      <style>body{font-family:Arial,sans-serif;padding:36px;color:#202124}table td{padding:6px 4px;border-bottom:1px solid #eee}</style>
+      </head><body>
+      <div style="text-align:center;border-bottom:3px solid #C62828;padding-bottom:14px;margin-bottom:18px">
+        <h1 style="margin:0;color:#8E0000;font-size:20px">TARA BASA ORIENTATION — Attendance Summary</h1>
+        <p style="margin:4px 0;color:#666;font-size:12px">November 25, 2026 • Samar State University • In partnership with DSWD</p>
+        <p style="margin:4px 0;color:#666;font-size:12px">Total Participants: <strong>${total}</strong></p>
+      </div>
+      ${section('By College', byCollege)}
+      ${section('By Modality', byModality)}
+      ${section('By Applying For', byApplying)}
+      ${section('By Year Level', byYear)}
+      ${section('By Program', byProgram)}
+      <p style="margin-top:24px;text-align:center;color:#999;font-size:11px">Generated ${new Date().toLocaleString('en-PH',{timeZone:'Asia/Manila'})}</p>
+      </body></html>
+    `);
+    w.document.close();
+    setTimeout(()=>w.print(), 400);
+  });
 }
 
 /* =========================================================
    🚪  LOGOUT
    ========================================================= */
 function setupLogout(){
-  const doLogout = () => {
-    document.getElementById('confirmTitle').innerHTML = `<i class="fa-solid fa-right-from-bracket" style="color:var(--red);margin-right:.4rem"></i> Sign Out`;
-    document.getElementById('confirmMsg').textContent = 'Are you sure you want to sign out of the administrator dashboard?';
-    const btn = document.getElementById('confirmActionBtn');
-    btn.textContent = 'Sign Out';
-    btn.className = 'btn btn-danger';
-    btn.onclick = async ()=>{
-      btn.disabled = true; btn.textContent = 'Signing out...';
-      try{
-        unsubs.forEach(u=>{ try{u();}catch(e){} });
-        unsubs = [];
-        await signOut(auth);
-        window.location.replace('login.html');
-      }catch(e){
-        toast('error','Logout Failed','Please try again.');
-        btn.disabled = false; btn.textContent = 'Sign Out';
-      }
-    };
-    document.getElementById('confirmModal').classList.add('show');
+  const doLogout = async ()=>{
+    try{
+      unsubs.forEach(u=>{ try{ u(); }catch(e){} });
+      await signOut(auth);
+      window.location.replace('login.html');
+    }catch(err){
+      console.error(err);
+      toast('error','Logout Failed','Unable to sign out. Please try again.');
+    }
   };
   document.getElementById('logoutBtn').addEventListener('click', doLogout);
   document.getElementById('logoutBtn2').addEventListener('click', doLogout);
 }
-
-/* Cleanup listeners on unload */
-window.addEventListener('beforeunload', ()=>{
-  unsubs.forEach(u=>{ try{u();}catch(e){} });
-});
 </script>
 </body>
 </html>

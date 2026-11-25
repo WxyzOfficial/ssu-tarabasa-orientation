@@ -334,6 +334,20 @@
           <div class="err-msg" id="err-modality">Please select your modality.</div>
         </div>
 
+        <!-- Applying -->
+        <div class="field">
+          <label for="applying">Applying For <span class="req">*</span></label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-user-plus lead-ic"></i>
+            <select id="applying">
+              <option value="">Applying For</option>
+              <option>Tutor</option>
+              <option>YDW</option>
+            </select>
+          </div>
+          <div class="err-msg" id="err-applying">Please select what you are applying for.</div>
+        </div>
+
         <button type="submit" class="btn btn-primary" id="submitBtn">
           <i class="fa-solid fa-check-to-slot"></i> <span>Submit Attendance</span>
         </button>
@@ -420,19 +434,6 @@ function toast(type, title, message, ms=4200){
    🌐  SESSION / TOKEN HANDLING
    The URL may contain ?session=<sessionId>&token=<rawToken>
    The session doc stores a tokenHash (SHA-256 of rawToken).
-   Since we cannot compute SHA-256 in Firestore rules directly,
-   we store the raw token too ONLY if the rules permit a client
-   to write it once. To keep things simple and secure, we store
-   the tokenHash here and validate it client-side, but ALSO rely
-   on the server (Cloud Function) or Firestore rules check that
-   session.status == 'active' and expiry has not passed.
-
-   ⚠️  For full cryptographic enforcement, deploy the Cloud
-   Function `submitAttendance` that re-validates the raw token
-   server-side. The client flow below works with direct Firestore
-   writes when rules allow (status active + not expired), which
-   is sufficient for orientation-scale events. See Cloud Function
-   section for stricter enforcement.
    ========================================================= */
 const urlParams = new URLSearchParams(window.location.search);
 const sessionId = urlParams.get('session') || '';
@@ -450,7 +451,6 @@ async function sha256Hex(str){
 async function validateSession(){
   const banner = document.getElementById('sessionBanner');
   if(!sessionId || !rawToken){
-    // No session provided. Check if there's any active session and prompt the user.
     banner.className = 'session-banner inactive';
     banner.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i>
       <span>This page must be accessed by scanning the attendance QR code. Please scan the QR code provided by the organizer.</span>`;
@@ -536,6 +536,7 @@ const nameEl = document.getElementById('name');
 const programEl = document.getElementById('program');
 const collegeEl = document.getElementById('college');
 const modalityEl = document.getElementById('modality');
+const applyingEl = document.getElementById('applying');
 const yearOptions = document.getElementById('yearOptions');
 
 // Year option selection highlighting
@@ -578,11 +579,14 @@ function validateForm(){
   if(!modalityEl.value){ markInvalid(modalityEl,true); setErr('err-modality',true); ok=false; }
   else { markInvalid(modalityEl,false); setErr('err-modality',false); }
 
+  if(!applyingEl.value){ markInvalid(applyingEl,true); setErr('err-applying',true); ok=false; }
+  else { markInvalid(applyingEl,false); setErr('err-applying',false); }
+
   return ok;
 }
 
 // Re-validate a field on input
-[nameEl,programEl,collegeEl,modalityEl].forEach(el=>{
+[nameEl,programEl,collegeEl,modalityEl,applyingEl].forEach(el=>{
   el.addEventListener('input', ()=>{ markInvalid(el,false); });
   el.addEventListener('change', ()=>{ markInvalid(el,false); });
 });
@@ -619,6 +623,7 @@ form.addEventListener('submit', async (e) => {
     const year = getYear();
     const college = collegeEl.value;
     const modality = modalityEl.value;
+    const applying = applyingEl.value;
 
     const attendanceRef = doc(db, 'attendance', currentUser.uid);
     const sessionRef = doc(db, 'attendanceSessions', sessionData.id);
@@ -652,6 +657,7 @@ form.addEventListener('submit', async (e) => {
         yearLevel: year,
         college,
         modality,
+        applying,
         eventName: EVENT_NAME,
         eventDate: EVENT_DATE,
         sessionId: sessionData.id,
@@ -661,7 +667,7 @@ form.addEventListener('submit', async (e) => {
 
     toast('success','Attendance Recorded','Your attendance has been successfully submitted.');
     showSuccess({
-      name, program, year, college, modality,
+      name, program, year, college, modality, applying,
       time: new Date()
     });
 
@@ -670,14 +676,13 @@ form.addEventListener('submit', async (e) => {
     const msg = err.message || '';
     if(msg === 'ALREADY_SUBMITTED'){
       toast('warning','Already Registered','You have already submitted your attendance for this event.');
-      // Show success screen with existing data? We fetch it:
       try{
         const snap = await getDoc(doc(db,'attendance',currentUser.uid));
         if(snap.exists()){
           const d = snap.data();
           showSuccess({
             name: d.name, program: d.program, year: d.yearLevel,
-            college: d.college, modality: d.modality,
+            college: d.college, modality: d.modality, applying: d.applying,
             time: d.createdAt?.toDate ? d.createdAt.toDate() : new Date()
           });
         }
@@ -715,6 +720,7 @@ function showSuccess(data){
     <div class="detail-row"><span class="k">Year Level</span><span class="v">${escapeHtml(data.year)}</span></div>
     <div class="detail-row"><span class="k">College</span><span class="v">${escapeHtml(data.college)}</span></div>
     <div class="detail-row"><span class="k">Modality</span><span class="v">${escapeHtml(data.modality)}</span></div>
+    <div class="detail-row"><span class="k">Applying</span><span class="v">${escapeHtml(data.applying)}</span></div>
     <div class="detail-row"><span class="k">Date</span><span class="v">${dateStr}</span></div>
     <div class="detail-row"><span class="k">Time</span><span class="v">${timeStr}</span></div>
   `;
@@ -758,6 +764,7 @@ document.getElementById('printConfirmBtn').addEventListener('click', () => {
         <tr><td class="k">Year Level</td><td class="v">${escapeHtml(d.year)}</td></tr>
         <tr><td class="k">College</td><td class="v">${escapeHtml(d.college)}</td></tr>
         <tr><td class="k">Modality</td><td class="v">${escapeHtml(d.modality)}</td></tr>
+        <tr><td class="k">Applying</td><td class="v">${escapeHtml(d.applying)}</td></tr>
         <tr><td class="k">Date</td><td class="v">${dateStr}</td></tr>
         <tr><td class="k">Time</td><td class="v">${timeStr}</td></tr>
       </table>
@@ -802,7 +809,7 @@ function escapeHtml(s){
         toast('info','Already Registered','You have already submitted your attendance.');
         showSuccess({
           name: d.name, program: d.program, year: d.yearLevel,
-          college: d.college, modality: d.modality,
+          college: d.college, modality: d.modality, applying: d.applying,
           time: d.createdAt?.toDate ? d.createdAt.toDate() : new Date()
         });
         return;
